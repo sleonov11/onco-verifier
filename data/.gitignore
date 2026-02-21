@@ -1,0 +1,11 @@
+*.pdf
+russco_pdfs/
+
+__pycache__/
+*.pyc
+
+.env
+
+.DS_Store
+
+russco_chunks.json
