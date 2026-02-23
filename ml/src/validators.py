@@ -245,23 +245,41 @@ class TherapyValidator:
                 confidence=1.0
             ))
 
-    # ==================== Утилиты ====================
 
     def _contains_any_drug(self, regimen: List[str], drug_set: Set[str]) -> bool:
         """Проверяет, содержит ли схема хотя бы один препарат из набора"""
         return any(drug in r for r in regimen for drug in drug_set)
 
     def _extract_percentage(self, value) -> Optional[float]:
-        """Извлекает числовое значение процента из строки (например, '50%' → 50.0)"""
+        """Извлекает числовое значение процента из строки (например, '65%' → 65.0)"""
         if value is None:
             return None
+
+        # Если уже число — возвращаем как есть
         if isinstance(value, (int, float)):
             return float(value)
 
-        # Ищем число в строке
-        match = re.search(r'(\\d+(?:\\.\\d+)?)\\s*%?', str(value).lower())
+        # Преобразуем в строку и убираем пробелы
+        str_value = str(value).strip()
+
+        # Удаляем знак процента если есть
+        if str_value.endswith('%'):
+            str_value = str_value[:-1].strip()
+
+        # Пробуем преобразовать в число
+        try:
+            return float(str_value)
+        except ValueError:
+            pass
+
+        # Если не получилось — ищем число в строке через regex
+        match = re.search(r'(\d+(?:\.\d+)?)', str_value)
         if match:
-            return float(match.group(1))
+            try:
+                return float(match.group(1))
+            except ValueError:
+                pass
+
         return None
 
 

@@ -11,7 +11,7 @@ from .models import EmbeddingModel
 
 class OptimizedGuidelineRetriever:
     """
-    Улучшенный retriever с:
+    retriever с:
     - Фильтрацией по метаданным в Chroma
     - Умным fallback на полный поиск при пустых результатах
     - Кэшированием частых запросов
@@ -21,7 +21,7 @@ class OptimizedGuidelineRetriever:
         self.embed_model = EmbeddingModel()
         self.chroma_client = chromadb.PersistentClient(path=CHROMA_PERSIST_DIR)
         self.collection_name = collection_name
-        self._query_cache = {}  # Простой LRU-кэш для повторных запросов
+        self._query_cache = {}
         self._cache_hits = 0
 
         # Подключение к коллекции
@@ -81,7 +81,6 @@ class OptimizedGuidelineRetriever:
         self.doc_metadatas = metadatas
         self.bm25_index = BM25Okapi([text.split() for text in texts])
 
-        # Строим индексы по метаданным для быстрой фильтрации
         self._build_metadata_index()
 
         logger.info(f"BM25 index built with {len(texts)} documents")
@@ -91,6 +90,9 @@ class OptimizedGuidelineRetriever:
         """Строит инвертированные индексы по метаданным для BM25"""
         for idx, metadata in enumerate(self.doc_metadatas):
             for field, value in metadata.items():
+                if isinstance(value, list):
+                    continue
+
                 if field not in self.metadata_index:
                     self.metadata_index[field] = {}
                 if value not in self.metadata_index[field]:
@@ -116,7 +118,6 @@ class OptimizedGuidelineRetriever:
                     else:
                         candidate_indices &= self.metadata_index[field][value]
                 else:
-                    # Нет документов с таким фильтром
                     return []
 
             if not candidate_indices:
@@ -220,7 +221,7 @@ class OptimizedGuidelineRetriever:
                 combined_scores[doc_id] = combined_scores.get(doc_id, 0) + bm25_weight * normalized_score
                 doc_info[doc_id] = (text, self.doc_metadatas[idx])
 
-        # Chroma: расстояние косинусное → скор (0..1)
+        # Chroma расстояние косинусное → скор (0..1)
         for text, dist, meta, doc_id in chroma_results:
             score = 1 / (1 + dist)  # чем меньше расстояние, тем выше скор
             combined_scores[doc_id] = combined_scores.get(doc_id, 0) + (1 - bm25_weight) * score
@@ -234,7 +235,7 @@ class OptimizedGuidelineRetriever:
             text, meta = doc_info[doc_id]
             result.append((text, meta, score, doc_id))
 
-        # Сохраняем в кэш (LRU с ограничением размера)
+        # Сохраняем в кэш
         if use_cache:
             if len(self._query_cache) > 1000:
                 self._query_cache.clear()
