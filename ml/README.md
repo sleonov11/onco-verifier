@@ -5,6 +5,13 @@ source .venv/bin/activate  # On Unix
 uv pip install -e .
 uv sync
 ```
+
+чтобы запустить код на gpu:
+```
+uv pip uninstall torch -y
+uv pip install torch==2.3.0 --index-url https://download.pytorch.org/whl/cu121
+```
+
 Run: uvicorn api:app --reload (localhost:8000/docs для Swagger)
 
 
@@ -16,14 +23,13 @@ Dependencies managed via pyproject.toml (uv/poetry compatible).
 
 Index data (initial setup):
 ```
-python -m scripts.index_all  # Or index_data.py --chunks data/chunks.jsonl
+uv run python -m scripts.index_all  # Or index_data.py --chunks data/chunks.jsonl
 ```
 
 ## Running the Service
 Start the FastAPI server:  
 ```
-uvicorn api:app --reload  # Development mode
-# Or production: uvicorn api:app --host 0.0.0.0 --port 8000 --workers 4
+uv run uvicorn src.api:app --host 0.0.0.0 --port 8000
 ```
 
 - Access: http://localhost:8000/docs (Swagger UI for interactive API testing).

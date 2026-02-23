@@ -9,7 +9,7 @@ from .pipeline import OptimizedOnkoPipeline
 from .config import logger
 
 app = FastAPI(
-    title="OnkoAssistant ML Service",
+    title="OncoAssistant ML Service",
     version="2.0",
     description="Optimized ML service for oncology treatment verification with deterministic validation"
 )

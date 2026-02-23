@@ -20,12 +20,12 @@ dependencies = [
     # ML deps с pins для compat
     "sentence-transformers==3.0.0",
     "transformers==4.42.0",
-    "torch>=2.0.0,<3.0",
+    "torch==2.3.0",
     "numpy>=1.24.0,<2.0",
 
     # Optim/ONNX
     "optimum[onnxruntime]>=1.16.0",
-    "onnxruntime>=1.16.0",  # Оставил, но optimum включает
+    "onnxruntime>=1.16.0",
 
     # Data and Config
     "pydantic>=2.0.0",

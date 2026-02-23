@@ -1,4 +1,5 @@
 import sys
+import json
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -9,31 +10,43 @@ from src.config import logger
 from rank_bm25 import BM25Okapi
 
 
+def find_chunk_files(root_dir: Path) -> list:
+    """Рекурсивно ищет .json и .jsonl файлы, исключая служебные"""
+    files = []
+    for ext in ('*.json', '*.jsonl'):
+        for f in root_dir.rglob(ext):
+            if f.name != 'golden_cases.json':
+                files.append(f)
+    return files
+
+
 def main():
-    data_dir = Path("data")
-    if not data_dir.exists():
-        logger.error(f"Directory {data_dir} not found")
+    project_root = Path(__file__).parent.parent.parent
+    labeled_dir = project_root / 'data' / 'labeled'
+
+    if not labeled_dir.exists():
+        logger.error(f"Directory {labeled_dir} does not exist")
         return
 
-    # Собираем все .json и .jsonl, кроме golden_cases.json
-    files = list(data_dir.glob("*.json")) + list(data_dir.glob("*.jsonl"))
-    files = [f for f in files if f.name != "golden_cases.json"]
-
-    if not files:
-        logger.warning("No chunk files found (excluding golden_cases.json)")
-        return
+    files = find_chunk_files(labeled_dir)
+    logger.info(f"Found {len(files)} chunk files in {labeled_dir}")
 
     all_chunks = []
     for file in files:
-        logger.info(f"Loading {file.name}...")
-        raw_chunks = load_chunks(file)
-        normalized = []
-        for c in raw_chunks:
-            norm = normalize_chunk(c)
-            if norm:
-                normalized.append(norm)
-        logger.info(f"  → {len(raw_chunks)} raw, {len(normalized)} normalized")
-        all_chunks.extend(normalized)
+        logger.info(f"Loading {file.relative_to(project_root)}...")
+        try:
+            raw_chunks = load_chunks(file)
+            normalized = []
+            for c in raw_chunks:
+                norm = normalize_chunk(c)
+                if norm:
+                    normalized.append(norm)
+            logger.info(f"  → {len(raw_chunks)} raw, {len(normalized)} normalized")
+            all_chunks.extend(normalized)
+        except json.JSONDecodeError as e:
+            logger.error(f"  ✗ File {file.name} is empty or not valid JSON, skipping. Error: {e}")
+        except Exception as e:
+            logger.error(f"  ✗ Unexpected error with {file.name}: {e}")
 
     logger.info(f"Total chunks after normalization: {len(all_chunks)}")
     if not all_chunks:
