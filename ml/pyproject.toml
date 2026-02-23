@@ -1,7 +1,64 @@
 [project]
-name = "ml"
-version = "0.1.0"
-description = "Add your description here"
+name = "onko-ml"
+version = "2.0.0"
+description = "Optimized ML service for oncology treatment verification with deterministic validation"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    # Core API
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "python-multipart>=0.0.9",
+
+    # RAG and Vector DB
+    "chromadb>=0.5.0",
+    "rank-bm25>=0.2.2",
+
+    # LLM
+    "openai>=1.0.0",
+
+    # ML deps с pins для compat
+    "sentence-transformers==3.0.0",
+    "transformers==4.42.0",
+    "torch>=2.0.0,<3.0",
+    "numpy>=1.24.0,<2.0",
+
+    # Optim/ONNX
+    "optimum[onnxruntime]>=1.16.0",
+    "onnxruntime>=1.16.0",  # Оставил, но optimum включает
+
+    # Data and Config
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "loguru>=0.7.0",
+    "orjson>=3.9.0",
+    "tqdm>=4.65.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "httpx>=0.24.0",
+    "black>=23.7.0",
+    "ruff>=0.0.280",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+python-preference = "only-managed"
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
