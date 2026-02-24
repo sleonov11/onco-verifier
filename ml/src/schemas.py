@@ -102,3 +102,19 @@ class CheckResponse(BaseModel):
     result: Result
     sources: List[Source] = []
     warnings: List[str] = []
+
+class ChatMessage(BaseModel):
+    role: str  # "user" или "assistant"
+    content: str
+
+class ChatRequest(BaseModel):
+    request_id: str
+    message: str
+    role: Role
+    history: List[ChatMessage] = []
+    context: Optional[Dict] = None
+
+class ChatResponse(BaseModel):
+    request_id: str
+    message: str
+    history: List[ChatMessage]
