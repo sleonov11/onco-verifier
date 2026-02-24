@@ -44,9 +44,9 @@ def main():
             logger.info(f"  → {len(raw_chunks)} raw, {len(normalized)} normalized")
             all_chunks.extend(normalized)
         except json.JSONDecodeError as e:
-            logger.error(f"  ✗ File {file.name} is empty or not valid JSON, skipping. Error: {e}")
+            logger.error(f" File {file.name} is empty or not valid JSON, skipping. Error: {e}")
         except Exception as e:
-            logger.error(f"  ✗ Unexpected error with {file.name}: {e}")
+            logger.error(f" Unexpected error with {file.name}: {e}")
 
     logger.info(f"Total chunks after normalization: {len(all_chunks)}")
     if not all_chunks:
