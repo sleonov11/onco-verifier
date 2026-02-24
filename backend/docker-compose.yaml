@@ -30,7 +30,7 @@ services:
     env_file:
       - .env
     ports:
-      - "${PORT}:3000"
+      - "${PORT}:8080"
 
 volumes:
   pg_data:

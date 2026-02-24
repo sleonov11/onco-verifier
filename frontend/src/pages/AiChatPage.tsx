@@ -224,6 +224,8 @@ export function AiChatPage() {
         abortRef.current.signal
       );
 
+      console.log(apiResp)
+
 
       const full = JSON.stringify(apiResp, null, 2);
 
