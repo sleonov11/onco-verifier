@@ -6,7 +6,8 @@ import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { ROLE_LABEL } from '../shared/types';
+import {userStore} from "../stores/user.ts";
+import { observer } from "mobx-react-lite";
 
 const { Text, Title } = Typography;
 
@@ -58,20 +59,18 @@ const schema = z.object({
 
 type SurveyValues = z.infer<typeof schema>;
 
-export function SurveyPage() {
+export const SurveyPage = observer(function SurveyPage() {
   const {
     control,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<SurveyValues>({
     resolver: zodResolver(schema) as any,
     shouldUnregister: true, // ✅ важно: удаляет значения размонтированных полей
     defaultValues: {
-      role: 'doctor',
-      name: '',
+      role: userStore.role,
+      name: userStore.name,
       email: '',
 
       // doctor
@@ -90,7 +89,7 @@ export function SurveyPage() {
     mode: 'onChange',
   });
 
-  const role = watch('role');
+  const role = userStore.role;
 
   const hint = useMemo(() => {
     return role === 'doctor'
@@ -98,35 +97,40 @@ export function SurveyPage() {
       : 'Пара вопросов помогут сделать ответы понятнее и полезнее для пациента.';
   }, [role]);
 
-  // ✅ При смене роли чистим поля противоположного блока,
-  // чтобы "хвосты" не попадали в submit/watch.
-  useEffect(() => {
-    if (role === 'doctor') {
-      // patient -> чистим patient-поля
-      setValue('symptoms', undefined, { shouldDirty: false, shouldValidate: false });
-      setValue('has_diagnosis', undefined, { shouldDirty: false, shouldValidate: false });
-      setValue('treatment_stage', undefined, { shouldDirty: false, shouldValidate: false });
-      setValue('wants_explanation', undefined, { shouldDirty: false, shouldValidate: false });
+    useEffect(() => {
+        const common = {
+            role: userStore.role,
+            name: userStore.name ?? "",
+            email: "",
+        };
 
-      // и ставим дефолты для doctor-полей (по желанию)
-      setValue('uses_guidelines', 'often', { shouldDirty: false, shouldValidate: false });
-      setValue('experience_years', 1);
-      setValue('workplace', "");
-      setValue("specialty", "");
-    } else {
-      // doctor -> чистим doctor-поля
-      setValue('specialty', undefined, { shouldDirty: false, shouldValidate: false });
-      setValue('workplace', undefined, { shouldDirty: false, shouldValidate: false });
-      setValue('experience_years', undefined, { shouldDirty: false, shouldValidate: false });
-      setValue('uses_guidelines', undefined, { shouldDirty: false, shouldValidate: false });
-      setValue('main_pain', undefined, { shouldDirty: false, shouldValidate: false });
-
-      // дефолты для patient-полей (по желанию)
-      setValue('has_diagnosis', 'unknown', { shouldDirty: false, shouldValidate: false });
-      setValue('treatment_stage', 'unknown', { shouldDirty: false, shouldValidate: false });
-      setValue('wants_explanation', 'simple', { shouldDirty: false, shouldValidate: false });
-    }
-  }, [role, setValue]);
+        if (userStore.role === "doctor") {
+            reset(
+                {
+                    ...common,
+                    specialty: "",
+                    workplace: "",
+                    experience_years: undefined,
+                    uses_guidelines: "often",
+                    main_pain: "",
+                    // patient-поля не задаём (shouldUnregister удалит)
+                },
+                { keepDirty: false, keepTouched: false }
+            );
+        } else {
+            reset(
+                {
+                    ...common,
+                    has_diagnosis: "unknown",
+                    treatment_stage: "unknown",
+                    wants_explanation: "simple",
+                    symptoms: "",
+                    // doctor-поля не задаём
+                },
+                { keepDirty: false, keepTouched: false }
+            );
+        }
+    }, [userStore.role, userStore.name, reset]);
 
   const onSubmit: SubmitHandler<SurveyValues> = async (values) => {
     try {
@@ -173,25 +177,6 @@ export function SurveyPage() {
       <Alert type="info" showIcon title="Заметка" description={hint} style={{ marginBottom: 16 }} />
 
       <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
-        {/* Роль */}
-        <Form.Item label="Роль" validateStatus={errors.role ? 'error' : undefined}>
-          <Controller
-            control={control}
-            name="role"
-            render={({ field }) => (
-              <Radio.Group
-                {...field}
-                optionType="button"
-                buttonStyle="solid"
-                options={[
-                  { label: ROLE_LABEL.doctor, value: 'doctor' },
-                  { label: ROLE_LABEL.patient, value: 'patient' },
-                ]}
-              />
-            )}
-          />
-        </Form.Item>
-
         {/* Общие поля */}
         <Form.Item
           label="Имя"
@@ -201,7 +186,9 @@ export function SurveyPage() {
           <Controller
             control={control}
             name="name"
-            render={({ field }) => <Input {...field} placeholder="Иван Иванов" />}
+            disabled
+            defaultValue={userStore.name}
+            render={({ field }) => <Input {...field} placeholder="Иван Иванов" disabled />}
           />
         </Form.Item>
 
@@ -420,4 +407,4 @@ export function SurveyPage() {
       </Form>
     </Card>
   );
-}
+})
