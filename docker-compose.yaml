@@ -29,6 +29,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
+      - ./data:/data:ro          # <-- ДОБАВИТЬ
       - fastapi_indices:/app/indices
       - fastapi_models:/app/models_cache
     # GPU (если нужно):
