@@ -1,54 +1,82 @@
-import { Layout, Menu, Button, Space, Typography } from "antd";
+import { Layout, Space, Typography, Segmented, Tag, Button } from "antd";
+import { observer } from "mobx-react-lite";
+import { useNavigate } from "react-router-dom";
+
+import { userStore } from "../../stores/user.ts";
 
 const { Header } = Layout;
 const { Text } = Typography;
 
-export function AppHeader() {
-  return (
-    <Header
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 10,
-        display: "flex",
-        alignItems: "center",
-        gap: 16,
-        padding: "0 16px",
-        width: "100%",
-      }}
-    >
-      {/* Лого / название */}
-      <Space align="center" size={8}>
-        <div
-          style={{
-            width: 28,
-            height: 28,
-            borderRadius: 8,
-            background: "rgba(255,255,255,0.25)",
-          }}
-        />
-        <Text style={{ color: "#fff" }} strong>
-          MyApp
-        </Text>
-      </Space>
+type PageKey = "ai" | "survey";
 
-      {/* Меню */}
-      <Menu
-        theme="dark"
-        mode="horizontal"
-        selectable={false}
-        items={[
-          { key: "home", label: "Главная" },
-          { key: "projects", label: "Проекты" },
-          { key: "about", label: "О нас" },
-        ]}
-        style={{ flex: 1, minWidth: 0 }}
-      />
+export const AppHeader = observer(
+    ({
+         page,
+     }: {
+        page: PageKey;
+    }) => {
+        const navigate = useNavigate();
 
-      {/* Правый блок */}
-      <Space>
-        <Button type="primary">Войти</Button>
-      </Space>
-    </Header>
-  );
-}
+        const handleLogout = () => {
+            userStore.reset();
+            navigate("/auth");
+        };
+
+        const roleLabel =
+            userStore.role === "doctor" ? "Врач" : "Пациент";
+
+        const roleColor =
+            userStore.role === "doctor" ? "blue" : "green";
+
+        return (
+            <Header style={{ display: "flex", alignItems: "center" }}>
+                <Space
+                    style={{
+                        width: "100%",
+                        justifyContent: "space-between",
+                    }}
+                >
+                    {/* Левый блок */}
+                    <Text style={{ color: "white", fontWeight: 600 }}>
+                        AI Project
+                    </Text>
+
+                    {/* Центр */}
+                    <Segmented
+                        value={page}
+                        onChange={(v) =>
+                            navigate(v === "survey" ? "/survey" : "/")
+                        }
+                        options={[
+                            { label: "Основное", value: "ai" },
+                            { label: "Опрос", value: "survey" },
+                        ]}
+                    />
+
+                    {/* Правый блок */}
+                    {userStore.name && userStore.role ? (
+                        <Space>
+                            <Tag color={roleColor}>{roleLabel}</Tag>
+
+                            <Text style={{ color: "white", marginRight: 100 }}>
+                                {userStore.name}
+                            </Text>
+
+                            <Button size="small" danger onClick={handleLogout}>
+                                Выйти
+                            </Button>
+                        </Space>
+                    ) : (
+                        <Button
+                            size="small"
+                            type="primary"
+                            onClick={() => navigate("/auth")}
+                        >
+                            Войти
+                        </Button>
+                    )}
+                </Space>
+            </Header>
+        );
+    }
+);
