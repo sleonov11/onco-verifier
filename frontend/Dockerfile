@@ -1,30 +1,13 @@
-# ====== Build stage ======
-FROM node:22.12-alpine AS build
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Сначала зависимости (кешируется лучше)
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
-# Потом исходники
 COPY . .
 
-# Важно: Vite кладёт сборку в /dist
-RUN npm run build
+EXPOSE 5173
 
-
-# ====== Run stage (nginx) ======
-FROM nginx:1.27-alpine
-
-# Удалим дефолтный конфиг и добавим свой (чтобы SPA роутинг работал)
-RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Скопируем статику
-COPY --from=build /app/dist /usr/share/nginx/html
-
-EXPOSE 80
-
-# Healthcheck (опционально)
-HEALTHCHECK --interval=10s --timeout=3s --retries=5 CMD wget -qO- http://localhost/ || exit 1
+# Vite должен слушать 0.0.0.0 чтобы быть доступным с хоста
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]

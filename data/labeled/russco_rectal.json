@@ -1,0 +1,596 @@
+[
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Диагностика: Жалобы, анамнез и лабораторные исследования",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": null,
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": null,
+      "evidence_level": "C (5)"
+    },
+    "rule": {
+      "condition": {
+        "выявление": "рак прямой кишки"
+      },
+      "recommendation": "Рекомендуется у всех пациентов при выявлении рака прямой кишки проводить тщательный сбор жалоб и анамнеза у пациента с целью выявления факторов, которые могут повлиять на выбор тактики лечения.",
+      "recommendation_type": "preferred",
+      "confidence": "low"
+    },
+    "text": {
+      "doctor_version": "Собрать жалобы и анамнез у всех пациентов для влияния на тактику лечения.",
+      "patient_version": "Вам нужно рассказать врачу о всех жалобах и истории болезни, чтобы выбрать лучший план лечения.",
+      "original_guideline_text": "Рекомендуется у всех пациентов при выявлении рака прямой кишки проводить тщательный сбор жалоб и анамнеза у пациента с целью выявления факторов, которые могут повлиять на выбор тактики лечения."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Диагностика: Жалобы, анамнез и лабораторные исследования",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": null,
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": null,
+      "evidence_level": "A (1)"
+    },
+    "rule": {
+      "condition": {
+        "пациенты": "с раком прямой кишки до начала лечения"
+      },
+      "recommendation": "Всем пациентам с раком прямой кишки до начала лечения рекомендуется определить уровень ракового эмбрионального антигена (РЭА) в крови с целью диагностики, выбора тактики лечения и оценки прогноза.",
+      "recommendation_type": "preferred",
+      "confidence": "high"
+    },
+    "text": {
+      "doctor_version": "Определить уровень РЭА у всех пациентов до лечения для диагностики, тактики и прогноза.",
+      "patient_version": "Вам нужно сдать анализ на РЭА, чтобы врач мог лучше понять ситуацию и спланировать лечение.",
+      "original_guideline_text": "Всем пациентам с раком прямой кишки до начала лечения рекомендуется определить уровень ракового эмбрионального антигена (РЭА) в крови с целью диагностики, выбора тактики лечения и оценки прогноза."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Диагностика: Инструментальные исследования",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": null,
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": "Колоноскопия с биопсией",
+      "evidence_level": "C (5)"
+    },
+    "rule": {
+      "condition": {
+        "подозрение": "на рак прямой кишки"
+      },
+      "recommendation": "Выполнить колоноскопию с взятием биопсийного материала для установления диагноза (наиболее информативный метод).",
+      "recommendation_type": "preferred",
+      "confidence": "low"
+    },
+    "text": {
+      "doctor_version": "Выполнить колоноскопию с биопсией для диагноза у всех с подозрением.",
+      "patient_version": "Вам нужно пройти колоноскопию и взять образцы, чтобы подтвердить диагноз.",
+      "original_guideline_text": "Выполнить колоноскопию с взятием биопсийного материала для установления диагноза (наиболее информативный метод)."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Стадирование",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": null,
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": null,
+      "evidence_level": null
+    },
+    "rule": {
+      "condition": {
+        "пациенты": "с раком прямой кишки"
+      },
+      "recommendation": "Для пациентов с раком прямой кишки рекомендуется стадирование по системе TNM-8 (2017) — единая для ободочной и прямой кишки (T: глубина инвазии; N: поражение лимфоузлов; M: метастазы).",
+      "recommendation_type": "preferred",
+      "confidence": "high"
+    },
+    "text": {
+      "doctor_version": "Применять TNM-8 для стадирования рака прямой кишки.",
+      "patient_version": "Ваш рак классифицируют по системе TNM для определения стадии.",
+      "original_guideline_text": "Для пациентов с раком прямой кишки рекомендуется стадирование по системе TNM-8 (2017) — единая для ободочной и прямой кишки (T: глубина инвазии; N: поражение лимфоузлов; M: метастазы)."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Стадирование",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": null,
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": null,
+      "evidence_level": null
+    },
+    "rule": {
+      "condition": {
+        "семейный_анамнез": "соответствие критериям Amsterdam I/II или Bethesda"
+      },
+      "recommendation": "При семейном анамнезе, соответствующем критериям Amsterdam I/II или Bethesda (подозрение на синдром Линча), рекомендуется генетическое тестирование на MSI и мутации.",
+      "recommendation_type": "preferred",
+      "confidence": "high"
+    },
+    "text": {
+      "doctor_version": "Генетическое обследование при подозрении на синдром Линча.",
+      "patient_version": "Если в семье много рака, проверьте гены на мутации, связанные с наследственным раком.",
+      "original_guideline_text": "При семейном анамнезе, соответствующем критериям Amsterdam I/II или Bethesda (подозрение на синдром Линча), рекомендуется генетическое тестирование на MSI и мутации."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Предоперационное/Неоадъювантное лечение",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": "II-III",
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": "Химиолучевая терапия (ХЛТ)",
+      "evidence_level": "A (2)"
+    },
+    "rule": {
+      "condition": {
+        "локализация": "нижнеампулярный рак T2-4bN0M0 или T любое N1-2M0"
+      },
+      "recommendation": "Провести химиолучевую терапию (ХЛТ), возможно увеличить суммарную очаговую дозу (СОД) до 56 Гр.",
+      "recommendation_type": "preferred",
+      "confidence": "high"
+    },
+    "text": {
+      "doctor_version": "Провести ХЛТ с СОД до 56 Гр для нижнеампулярного рака с поражением ЦГР.",
+      "patient_version": "Вам назначат химиолучевую терапию перед операцией для уменьшения опухоли.",
+      "original_guideline_text": "Провести химиолучевую терапию (ХЛТ), возможно увеличить суммарную очаговую дозу (СОД) до 56 Гр."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Предоперационное/Неоадъювантное лечение",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": "II-III",
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": "Химиолучевая терапия (ХЛТ)",
+      "evidence_level": "Высокая (1)"
+    },
+    "rule": {
+      "condition": {
+        "стадия": "локально-распространенный рак T3-4 или N+"
+      },
+      "recommendation": "Неоадъювантная ХЛТ с СОД 50-52 Гр; альтернатива: короткий курс ЛТ (РОД 2 Гр, СОД 25 Гр при T3).",
+      "recommendation_type": "preferred",
+      "confidence": "high"
+    },
+    "text": {
+      "doctor_version": "ХЛТ с СОД 50-52 Гр перед операцией для стадий II-III. / Короткий курс ЛТ (РОД 5 Гр, СОД 25 Гр).",
+      "patient_version": "Комбинация радиации и химии для уменьшения опухоли перед хирургией. / Краткий курс радиации перед операцией.",
+      "original_guideline_text": "Неоадъювантная ХЛТ с СОД 50-52 Гр; альтернатива: короткий курс ЛТ (РОД 2 Гр, СОД 25 Гр при T3)."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Предоперационное/Неоадъювантное лечение",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": "II-III",
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": "Тотальная неоадъювантная терапия (ТНТ)",
+      "evidence_level": "Высокая (1)"
+    },
+    "rule": {
+      "condition": {
+        "стадия": "локально-распространенный рак"
+      },
+      "recommendation": "Тотальная неоадъювантная терапия (ТНТ) с FOLFOX или XELOX (3+ месяца).",
+      "recommendation_type": "preferred",
+      "confidence": "high"
+    },
+    "text": {
+      "doctor_version": "ТНТ с FOLFOX/XELOX для локально-распространенного рака.",
+      "patient_version": "Перед операцией вводят лекарства, чтобы уменьшить опухоль, по схеме FOLFOX.",
+      "original_guideline_text": "Тотальная неоадъювантная терапия (ТНТ) с FOLFOX или XELOX (3+ месяца)."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Предоперационное/Неоадъювантное лечение",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": "II-III",
+      "histology": "аденокарцинома",
+      "molecular_markers": {
+        "MSI": "положительный",
+        "RAS": "отсутствие мутаций"
+      },
+      "therapy_line": null,
+      "treatment_schema": "Ниволумаб + ипилимумаб или пембролизумаб",
+      "evidence_level": "A (2)"
+    },
+    "rule": {
+      "condition": {
+        "тип": "MSI-положительный рак с потенциально резектабельными метастазами"
+      },
+      "recommendation": "В 1-й линии: Ниволумаб + ипилимумаб или пембролизумаб (моно, при отсутствии RAS-мутаций) до прогрессирования/резектабельности; альтернатива: FOLFOX/XELOX + ниволумаб/пембролизумаб. После R0-резекции продолжить до 1 года при хорошей переносимости.",
+      "recommendation_type": "preferred",
+      "confidence": "high"
+    },
+    "text": {
+      "doctor_version": "При MSI-положительном раке с резектабельными метастазами: ниволумаб + ипилимумаб или пембролизумаб; допустимо FOLFOX + ниволумаб. Продолжить до 1 года после резекции.",
+      "patient_version": "Если рак имеет особый тип (MSI) и метастазы удалимы, назначат ниволумаб с ипилимумабом или пембролизумаб; комбинируют с химией. Продолжать до года после операции.",
+      "original_guideline_text": "В 1-й линии: Ниволумаб + ипилимумаб или пембролизумаб (моно, при отсутствии RAS-мутаций) до прогрессирования/резектабельности; альтернатива: FOLFOX/XELOX + ниволумаб/пембролизумаб. После R0-резекции продолжить до 1 года при хорошей переносимости."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Хирургическое лечение",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": null,
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": "Лапароскопическое хирургическое лечение",
+      "evidence_level": "A (1)"
+    },
+    "rule": {
+      "condition": {
+        "пациенты": "с неметастатическим раком"
+      },
+      "recommendation": "Выполнять хирургическое лечение лапароскопическим доступом для ускорения реабилитации и снижения осложнений (при наличии квалифицированной бригады).",
+      "recommendation_type": "preferred",
+      "confidence": "high"
+    },
+    "text": {
+      "doctor_version": "Выполнять лапароскопическое хирургическое лечение для снижения осложнений.",
+      "patient_version": "Операцию постараются сделать через маленькие разрезы для быстрого восстановления.",
+      "original_guideline_text": "Выполнять хирургическое лечение лапароскопическим доступом для ускорения реабилитации и снижения осложнений (при наличии квалифицированной бригады)."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Хирургическое лечение",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": "I-II",
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": "Резекция с тотальной мезоректальной эктомией (TME)",
+      "evidence_level": "Высокая (1)"
+    },
+    "rule": {
+      "condition": {
+        "стадия": "I-II"
+      },
+      "recommendation": "Резекция с тотальной мезоректальной эктомией (TME) для локального контроля.",
+      "recommendation_type": "preferred",
+      "confidence": "high"
+    },
+    "text": {
+      "doctor_version": "Хирургическое лечение с TME для стадий I-II.",
+      "patient_version": "Операция по удалению опухоли с окружающими тканями для полного иссечения.",
+      "original_guideline_text": "Резекция с тотальной мезоректальной эктомией (TME) для локального контроля."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Хирургическое лечение",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": null,
+      "histology": "аденокарцинома",
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": "Трансанальная эндоскопическая микрохирургия (TEM)",
+      "evidence_level": "Средняя (2)"
+    },
+    "rule": {
+      "condition": {
+        "глубина_инвазии": "субмукозная, T1"
+      },
+      "recommendation": "Трансанальная эндоскопическая микрохирургия (TEM) как альтернатива.",
+      "recommendation_type": "alternative",
+      "confidence": "medium"
+    },
+    "text": {
+      "doctor_version": "TEM при T1 аденокарциноме с инвазией в подслизистый слой.",
+      "patient_version": "Малотравматичная операция через задний проход для удаления маленькой опухоли.",
+      "original_guideline_text": "Трансанальная эндоскопическая микрохирургия (TEM) как альтернатива."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Хирургическое лечение",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": "IV",
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": "Резекция метастазов",
+      "evidence_level": "B (3)"
+    },
+    "rule": {
+      "condition": {
+        "метастазы": "резектабельные в печени/легких"
+      },
+      "recommendation": "Выполнить хирургическое вмешательство (резекцию) для улучшения выживаемости.",
+      "recommendation_type": "preferred",
+      "confidence": "medium"
+    },
+    "text": {
+      "doctor_version": "Выполнить резекцию метастазов при резектабельности для улучшения выживаемости.",
+      "patient_version": "Если метастазы можно удалить, операция поможет жить дольше.",
+      "original_guideline_text": "Выполнить хирургическое вмешательство (резекцию) для улучшения выживаемости."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Адъювантная терапия",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": "II-III",
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": "Адъювантная химиотерапия",
+      "evidence_level": "B (2)"
+    },
+    "rule": {
+      "condition": {
+        "предоперационное_лечение": "отсутствие"
+      },
+      "recommendation": "Отказаться от послеоперационной лучевой терапии в пользу адъювантной химиотерапии (FOLFOX).",
+      "recommendation_type": "preferred",
+      "confidence": "medium"
+    },
+    "text": {
+      "doctor_version": "Отказаться от послеоперационной ЛТ, предпочесть адъювантную ХТ для II-III стадии.",
+      "patient_version": "После операции химиотерапия предпочтительнее лучевой для вашей стадии.",
+      "original_guideline_text": "Отказаться от послеоперационной лучевой терапии в пользу адъювантной химиотерапии (FOLFOX)."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Адъювантная терапия",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": "II-III",
+      "histology": "аденокарцинома",
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": "XELOX или FOLFOX",
+      "evidence_level": "A (2)"
+    },
+    "rule": {
+      "condition": {
+        "после_хирургии": "с предоперационной ХЛТ, ypT3-4 N0 или ypT1-3 N1"
+      },
+      "recommendation": "Адъювантная химиотерапия: XELOX до 3-6 мес или FOLFOX до 6 мес (суммарно, включая предоперационное).",
+      "recommendation_type": "preferred",
+      "confidence": "high"
+    },
+    "text": {
+      "doctor_version": "После ХЛТ: при ypT3-4 N0 или ypT1-3 N1 — XELOX до 3-6 мес или FOLFOX до 6 мес.",
+      "patient_version": "После операции и химии перед ней: дополнительные лекарства от рака на 3-6 месяцев для снижения риска возврата.",
+      "original_guideline_text": "Адъювантная химиотерапия: XELOX до 3-6 мес или FOLFOX до 6 мес (суммарно, включая предоперационное)."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Адъювантная терапия",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": "II",
+      "histology": "аденокарцинома",
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": "Аналоги пиримидина",
+      "evidence_level": "A (2)"
+    },
+    "rule": {
+      "condition": {
+        "после_хирургии": "без предоперационной ХЛТ, pT3 N0"
+      },
+      "recommendation": "Адъювантная химиотерапия аналогами пиримидина в монорежиме до 6 мес; альтернатива: XELOX/FOLFOX на 3-6 мес. При I стадии после ХЛТ — возможно воздержаться.",
+      "recommendation_type": "preferred",
+      "confidence": "high"
+    },
+    "text": {
+      "doctor_version": "Без предоперационной терапии: при pT3 N0 — аналоги пиримидина моно до 6 мес или XELOX/FOLFOX; при I стадии после ХЛТ — возможно без адъювантной.",
+      "patient_version": "После операции без предварительной химии: лекарства на основе пиримидина на 6 месяцев, или комбинации, если рак в стадии II.",
+      "original_guideline_text": "Адъювантная химиотерапия аналогами пиримидина в монорежиме до 6 мес; альтернатива: XELOX/FOLFOX на 3-6 мес. При I стадии после ХЛТ — возможно воздержаться."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Адъювантная терапия",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": "III",
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": "XELOX",
+      "evidence_level": "Высокая (1)"
+    },
+    "rule": {
+      "condition": {
+        "поражение": "лимфоузлов N+"
+      },
+      "recommendation": "Адъювантная химиотерапия по схеме XELOX после операции.",
+      "recommendation_type": "preferred",
+      "confidence": "high"
+    },
+    "text": {
+      "doctor_version": "Адъювантная ХТ XELOX для стадии III после резекции.",
+      "patient_version": "После операции лекарства для предотвращения рецидива по схеме XELOX.",
+      "original_guideline_text": "Адъювантная химиотерапия по схеме XELOX после операции."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Лечение метастазов и паллиативная терапия",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": "IV",
+      "histology": null,
+      "molecular_markers": {},
+      "therapy_line": null,
+      "treatment_schema": "Паллиативное лекарственное лечение",
+      "evidence_level": "C (5)"
+    },
+    "rule": {
+      "condition": {
+        "пациенты": "неоперабельные с тяжелой сопутствующей патологией"
+      },
+      "recommendation": "Паллиативное лекарственное лечение или симптоматическая терапия для продления жизни и контроля симптомов; возможно стентирование опухоли или разгрузочная стома.",
+      "recommendation_type": "preferred",
+      "confidence": "low"
+    },
+    "text": {
+      "doctor_version": "У неоперабельных пациентов с тяжелой сопутствующей патологией: паллиативная химиотерапия или симптоматическая терапия; стентирование или стома.",
+      "patient_version": "Если операция невозможна из-за других болезней, врач предложит лечение для облегчения симптомов и продления жизни.",
+      "original_guideline_text": "У неоперабельных пациентов с тяжелой сопутствующей патологией: паллиативная химиотерапия или симптоматическая терапия; стентирование или стома."
+    }
+  },
+  {
+    "source": {
+      "guideline": "Рак прямой кишки",
+      "section": "Лечение метастазов и паллиативная терапия",
+      "page": "N/A",
+      "country": "ru"
+    },
+    "metadata": {
+      "nosology": "Рак прямой кишки",
+      "icd10": "C20",
+      "stage": "IV",
+      "histology": null,
+      "molecular_markers": {
+        "RAS": "отсутствие мутаций"
+      },
+      "therapy_line": 1,
+      "treatment_schema": "mFOLFOX6, XELOX или FOLFIRI",
+      "evidence_level": null
+    },
+    "rule": {
+      "condition": {
+        "метастатический_рак": "отсутствие RAS-мутаций"
+      },
+      "recommendation": "1-я линия — mFOLFOX6, XELOX или FOLFIRI.",
+      "recommendation_type": "preferred",
+      "confidence": "high"
+    },
+    "text": {
+      "doctor_version": "Паллиативная химиотерапия (метастатический, отсутствие RAS-мутаций): 1-я линия — mFOLFOX6, XELOX или FOLFIRI.",
+      "patient_version": "Для лечения метастазов без мутаций RAS используют химиотерапию по схемам mFOLFOX6 или аналогичным.",
+      "original_guideline_text": "Паллиативная химиотерапия (метастатический, отсутствие RAS-мутаций): 1-я линия — mFOLFOX6, XELOX или FOLFIRI."
+    }
+  }
+]
