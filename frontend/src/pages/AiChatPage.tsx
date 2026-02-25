@@ -24,6 +24,9 @@ import { ROLE_LABEL } from '../shared/types';
 import { streamText } from '../shared/stream';
 
 import { postCheck } from "../shared/api";
+import { Chat } from "../components/Chat/Chat";
+import {chatStore} from "../stores/chat.ts";
+import {userStore} from "../stores/user.ts";
 
 const { Text, Title } = Typography;
 
@@ -92,30 +95,30 @@ const schema = z.object({
   input: z.object({
     diagnosis: z.object({
       name: z.string().trim().min(2, 'Укажи диагноз (минимум 2 символа).'),
-      icd10: z.string().trim().optional(),
-      stage: z.string().trim().optional(),
-      tnm: z.string().trim().optional(),
-      histology: z.string().trim().optional(),
+      icd10: z.string().trim(),
+      stage: z.string().trim(),
+      tnm: z.string().trim(),
+      histology: z.string().trim(),
     }),
 
     molecular_markers: z.object({
-      EGFR: z.enum(['positive', 'negative', 'unknown']).optional(),
-      ALK: z.enum(['positive', 'negative', 'unknown']).optional(),
-      PD_L1: z.string().trim().optional(),
+      EGFR: z.enum(['positive', 'negative', 'unknown']),
+      ALK: z.enum(['positive', 'negative', 'unknown']),
+      PD_L1: z.string().trim(),
     }),
 
     patient_context: z.object({
-      age: z.number().int().min(0).max(130).optional(),
-      sex: z.enum(['male', 'female', 'other']).optional(),
+      age: z.number().int().min(0).max(130),
+      sex: z.enum(['male', 'female', 'other']),
       comorbidities: z.array(z.string().trim().min(1)).default([]),
       symptoms: z.array(z.string().trim().min(1)).default([]),
     }),
 
     treatment: z.object({
-      therapy_line: z.number().int().min(1).max(10).optional(),
+      therapy_line: z.number().int().min(1).max(10),
       proposed_regimen: z.array(z.string().trim().min(1)).default([]),
-      cycle: z.string().trim().optional(),
-      notes: z.string().trim().optional(),
+      cycle: z.string().trim(),
+      notes: z.string().trim(),
     }),
 
     free_text: z.object({
@@ -133,10 +136,12 @@ function TagsField({
                      value,
                      onChange,
                      placeholder,
+    disabled,
                    }: {
   value?: string[];
   onChange?: (v: string[]) => void;
   placeholder?: string;
+  disabled?: boolean;
 }) {
   return (
     <Select
@@ -148,12 +153,13 @@ function TagsField({
       style={{ width: '100%' }}
       maxTagCount="responsive"
       options={[]}
+      disabled={disabled}
     />
   );
 }
 
 export function AiChatPage() {
-  const [answer, setAnswer] = useState<string>('');
+  const [_, setAnswer] = useState<string>('');
   const [isStreaming, setIsStreaming] = useState(false);
 
   const abortRef = useRef<AbortController | null>(null);
@@ -166,7 +172,7 @@ export function AiChatPage() {
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      role: 'doctor',
+      role: userStore.role,
       locale: 'ru',
       options: {
         guideline_scope: 'ru_minzdrav',
@@ -253,59 +259,17 @@ export function AiChatPage() {
         </Title>
 
         <Text type="secondary">
-          Заполни минимум (диагноз + текст). Для врача доступен структурированный режим — он повышает точность проверки.
+            {role === 'doctor' ? "Для врача доступен структурированный режим — он повышает точность проверки."
+            : "Для пациента доступен режим получения отзыва о лечении."
+            }
         </Text>
 
         <Divider />
 
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
-          {/* Роль */}
-          <Form.Item
-            label="Роль"
-            help={<Text type="secondary">{roleHint}</Text>}
-            validateStatus={errors.role ? 'error' : undefined}
-          >
-            <Controller
-              control={control}
-              name="role"
-              render={({ field }) => (
-                <Radio.Group
-                  {...field}
-                  optionType="button"
-                  buttonStyle="solid"
-                  options={[
-                    { label: ROLE_LABEL.doctor, value: 'doctor' },
-                    { label: ROLE_LABEL.patient, value: 'patient' },
-                  ]}
-                />
-              )}
-            />
-          </Form.Item>
-
-          {/* Источники */}
-          <Form.Item
-            label="Источник клинических рекомендаций"
-            help={<Text type="secondary">{scopeHint}</Text>}
-          >
-            <Controller
-              control={control}
-              name="options.guideline_scope"
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  options={[
-                    { label: GUIDELINE_SCOPE_LABEL.ru_minzdrav, value: 'ru_minzdrav' },
-                    { label: GUIDELINE_SCOPE_LABEL.intl, value: 'intl' },
-                    { label: GUIDELINE_SCOPE_LABEL.mixed, value: 'mixed' },
-                  ]}
-                />
-              )}
-            />
-          </Form.Item>
-
           {/* Диагноз (минимум обязателен всегда) */}
           <Form.Item
-            label="Диагноз (минимум обязателен)"
+            label="Диагноз"
             validateStatus={diagnosisError ? 'error' : undefined}
             help={diagnosisError}
           >
@@ -315,6 +279,7 @@ export function AiChatPage() {
               render={({ field }) => (
                 <Input
                   {...field}
+                  disabled={role === 'patient'}
                   placeholder={role === 'doctor' ? 'Напр.: Немелкоклеточный рак лёгкого' : 'Напр.: рак лёгкого'}
                 />
               )}
@@ -323,8 +288,7 @@ export function AiChatPage() {
 
           {/* Свободный текст — главный для пациента, важный и для врача */}
           <Form.Item
-            label={role === 'doctor' ? 'Текст выписки / назначения (можно вставить целиком)' : 'Сообщение (что назначили и что беспокоит)'}
-            help={<Text type="secondary">Можно вставить текст целиком. Без персональных данных.</Text>}
+            label={role === 'doctor' ? 'Текст выписки / назначения' : 'Сообщение (что назначили и что беспокоит)'}
           >
             <Controller
               control={control}
@@ -344,17 +308,20 @@ export function AiChatPage() {
           </Form.Item>
 
           {/* Структурированный режим: показываем всегда, но подсветим что “для врача полезнее” */}
-          <Alert
-            type="info"
-            showIcon
-            title="Структурированные поля повышают точность"
-            description={
-              role === 'doctor'
-                ? 'Заполни по возможности стадию, TNM, гистологию, маркеры и схему лечения — так проверка будет точнее.'
-                : 'Если знаешь стадию/лекарства — можешь указать. Если нет — достаточно текста выше.'
-            }
-            style={{ marginBottom: 12 }}
-          />
+          {
+            role === 'doctor' &&
+            <Alert
+              type="info"
+              showIcon
+              title="Структурированные поля повышают точность"
+              description={
+                  role === 'doctor'
+                      ? 'Заполни по возможности стадию, TNM, гистологию, маркеры и схему лечения — так проверка будет точнее.'
+                      : 'Если знаешь стадию/лекарства — можешь указать. Если нет — достаточно текста выше.'
+              }
+              style={{marginBottom: 12}}
+            />
+          }
 
           <Collapse
             defaultActiveKey={role === 'doctor' ? ['dx', 'tx'] : []}
@@ -370,6 +337,7 @@ export function AiChatPage() {
                           control={control}
                           name="input.diagnosis.icd10"
                           render={({ field }) => <Input {...field} placeholder="Напр.: C34" />}
+                          disabled={role === 'patient'}
                         />
                       </Form.Item>
 
@@ -378,6 +346,7 @@ export function AiChatPage() {
                           control={control}
                           name="input.diagnosis.stage"
                           render={({ field }) => <Select {...field} allowClear options={stageOptions} placeholder="Выбери" />}
+                          disabled={role === 'patient'}
                         />
                       </Form.Item>
 
@@ -386,6 +355,7 @@ export function AiChatPage() {
                           control={control}
                           name="input.diagnosis.tnm"
                           render={({ field }) => <Input {...field} placeholder="Напр.: T1N2M0" />}
+                          disabled={role === 'patient'}
                         />
                       </Form.Item>
 
@@ -394,6 +364,7 @@ export function AiChatPage() {
                           control={control}
                           name="input.diagnosis.histology"
                           render={({ field }) => <Select {...field} allowClear options={histologyOptions} placeholder="Выбери" />}
+                          disabled={role === 'patient'}
                         />
                       </Form.Item>
                     </Space>
@@ -413,6 +384,7 @@ export function AiChatPage() {
                           render={({ field }) => (
                             <Select {...field} allowClear options={markerOptions} placeholder="Выбери" />
                           )}
+                          disabled={role === 'patient'}
                         />
                       </Form.Item>
 
@@ -423,6 +395,7 @@ export function AiChatPage() {
                           render={({ field }) => (
                             <Select {...field} allowClear options={markerOptions} placeholder="Выбери" />
                           )}
+                          disabled={role === 'patient'}
                         />
                       </Form.Item>
 
@@ -431,18 +404,16 @@ export function AiChatPage() {
                           control={control}
                           name="input.molecular_markers.PD_L1"
                           render={({ field }) => <Input {...field} placeholder='Напр.: "60%" или ">=50%"' />}
+                          disabled={role === 'patient'}
                         />
                       </Form.Item>
                     </Space>
-                    <Text type="secondary">
-                      Если маркеры неизвестны — оставь пустыми или поставь <Tag>unknown</Tag>.
-                    </Text>
                   </Space>
                 ),
               },
               {
                 key: 'patient',
-                label: 'Контекст пациента (опционально)',
+                label: 'Контекст пациента',
                 children: (
                   <Space orientation="vertical" size={12} style={{ width: '100%' }}>
                     <Space wrap style={{ width: '100%' }}>
@@ -459,6 +430,7 @@ export function AiChatPage() {
                               placeholder="Напр.: 61"
                             />
                           )}
+                          disabled={role === 'patient'}
                         />
                       </Form.Item>
 
@@ -469,6 +441,7 @@ export function AiChatPage() {
                           render={({ field }) => (
                             <Select {...field} allowClear options={sexOptions} placeholder="Выбери" />
                           )}
+                          disabled={role === 'patient'}
                         />
                       </Form.Item>
                     </Space>
@@ -482,8 +455,10 @@ export function AiChatPage() {
                             value={field.value}
                             onChange={field.onChange}
                             placeholder="Напр.: ХОБЛ, СД2, ИБС..."
+                            disabled={role === 'patient'}
                           />
                         )}
+                        disabled={role === 'patient'}
                       />
                     </Form.Item>
 
@@ -492,8 +467,14 @@ export function AiChatPage() {
                         control={control}
                         name="input.patient_context.symptoms"
                         render={({ field }) => (
-                          <TagsField value={field.value} onChange={field.onChange} placeholder="Напр.: кашель, одышка, боль..." />
+                          <TagsField
+                            value={field.value}
+                            onChange={field.onChange}
+                            placeholder="Напр.: кашель, одышка, боль..."
+                            disabled={role === 'patient'}
+                          />
                         )}
+                        disabled={role === 'patient'}
                       />
                     </Form.Item>
                   </Space>
@@ -501,7 +482,7 @@ export function AiChatPage() {
               },
               {
                 key: 'tx',
-                label: 'Назначенное лечение (структура)',
+                label: 'Назначенное лечение',
                 children: (
                   <Space orientation="vertical" size={12} style={{ width: '100%' }}>
                     <Space wrap style={{ width: '100%' }}>
@@ -512,6 +493,7 @@ export function AiChatPage() {
                           render={({ field }) => (
                             <InputNumber {...field} style={{ width: '100%' }} min={1} max={10} placeholder="Напр.: 1" />
                           )}
+                          disabled={role === 'patient'}
                         />
                       </Form.Item>
 
@@ -520,8 +502,15 @@ export function AiChatPage() {
                           control={control}
                           name="input.treatment.cycle"
                           render={({ field }) => (
-                            <Select {...field} allowClear options={cycleOptions} placeholder="Выбери или оставь пустым" />
+                            <Select
+                              {...field}
+                              allowClear
+                              options={cycleOptions}
+                              placeholder="Выбери или оставь пустым"
+                              disabled={role === 'patient'}
+                            />
                           )}
+                          disabled={role === 'patient'}
                         />
                       </Form.Item>
                     </Space>
@@ -531,8 +520,14 @@ export function AiChatPage() {
                         control={control}
                         name="input.treatment.proposed_regimen"
                         render={({ field }) => (
-                          <TagsField value={field.value} onChange={field.onChange} placeholder="Напр.: Пембролизумаб, Пеметрексед, Цисплатин" />
+                          <TagsField
+                            value={field.value}
+                            onChange={field.onChange}
+                            placeholder="Напр.: Пембролизумаб, Пеметрексед, Цисплатин"
+                            disabled={role === 'patient'}
+                          />
                         )}
+                        disabled={role === 'patient'}
                       />
                     </Form.Item>
 
@@ -545,8 +540,10 @@ export function AiChatPage() {
                             {...field}
                             placeholder="Дозировки, число циклов, противопоказания, переносимость..."
                             autoSize={{ minRows: 3, maxRows: 8 }}
+                            disabled={role === 'patient'}
                           />
                         )}
+                        disabled={role === 'patient'}
                       />
                     </Form.Item>
                   </Space>
@@ -621,7 +618,7 @@ export function AiChatPage() {
 
           <Space>
             <Button type="primary" htmlType="submit" loading={isSubmitting || isStreaming} disabled={isSubmitting || isStreaming}>
-              Проверить
+              Сравнить
             </Button>
 
             <Button onClick={stopStreaming} disabled={!isStreaming} danger>
@@ -631,13 +628,30 @@ export function AiChatPage() {
         </Form>
       </Card>
 
-      <Card title="Ответ" extra={isStreaming ? <Text type="secondary">печатает…</Text> : null}>
-        {answer ? (
-          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{answer}</pre>
-        ) : (
-          <Text type="secondary">Пока пусто. Заполни поля и нажми «Проверить» — тут появится ответ.</Text>
-        )}
-      </Card>
+      {/*<Card title="Ответ" extra={isStreaming ? <Text type="secondary">печатает…</Text> : null}>*/}
+      {/*  {answer ? (*/}
+      {/*    <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{answer}</pre>*/}
+      {/*  ) : (*/}
+      {/*    <Text type="secondary">Пока пусто. Заполни поля и нажми «Проверить» — тут появится ответ.</Text>*/}
+      {/*  )}*/}
+      {/*</Card>*/}
+        {chatStore.messages.length > 0 && <Chat
+            title="AI-диалог"
+            onSend={async (_) => {
+                // сюда логика запроса к backend
+                const data: ParsedValues = schema.parse(watch());
+
+                const apiResp = await postCheck(
+                    {
+                        role: data.role,
+                        locale: data.locale,
+                        input: data.input,
+                    }
+                );
+
+                chatStore.addAssistantMessage(JSON.stringify(apiResp, null, 2));
+            }}
+        />}
     </Space>
   );
 }
