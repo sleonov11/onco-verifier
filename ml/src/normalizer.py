@@ -62,6 +62,10 @@ def normalize_chunk(chunk: Dict) -> Optional[Dict]:
         if value is not None:
             cleaned_metadata[key] = _sanitize_metadata_value(value)
 
+    # Приводим строковые метаданные к нижнему регистру для регистронезависимого поиска
+    for key, value in cleaned_metadata.items():
+        if isinstance(value, str):
+            cleaned_metadata[key] = value.lower()
     # 5. ID
     chunk_id = chunk.get("id")
     if not chunk_id:

@@ -71,7 +71,7 @@ class OptimizedOnkoPipeline:
 
             metadata_filters = None
             if self.use_metadata_filter:
-                metadata_filters = self._build_metadata_filters(request.input)
+                metadata_filters = self._build_nosology_filter(request.input)
                 logger.debug(f"Metadata filters: {metadata_filters}")
 
             t2 = time.time()
@@ -190,6 +190,36 @@ class OptimizedOnkoPipeline:
                     break
 
         return filters if filters else None
+
+    def _build_nosology_filter(self, input_data: InputData) -> Optional[Dict]:
+        """
+        УМНЫЙ фильтр специально для EGJ / пищеводно-желудочного перехода.
+        """
+        if not input_data.diagnosis.name:
+            return None
+
+        original = input_data.diagnosis.name.lower().strip()
+
+        # Если это явно EGJ — расширяем максимально широко
+        if any(x in original for x in ["пищеводно-желудоч", "эзофагогастраль", "egj", "кардио", "esophagogastric"]):
+            # Используем только $eq операторы, так как Chroma не поддерживает $contains для строк
+            return {
+                "$or": [
+                    {"nosology": {"$eq": "рак желудка"}},
+                    {"nosology": {"$eq": "рак пищевода"}},
+                    {"nosology": {"$eq": "аденокарцинома пищевода и пищеводно-желудочного перехода"}},
+                    {"nosology": {"$eq": "рак пищеводно-желудочного перехода"}},
+                    {"nosology": {"$eq": "esophagogastric junction cancer"}},
+                    {"nosology": {"$eq": "egj adenocarcinoma"}},
+                ]
+            }
+
+        # Для CUP — вообще не фильтруем (или отдельная логика)
+        if "невыявленного первичного очага" in original or "cup" in original.lower():
+            return None
+
+        # Для остальных — обычный фильтр
+        return {"nosology": {"$eq": original}}
 
     def _rerank_with_fallback(self, query_text: str, retrieved: List) -> List:
         """
@@ -318,4 +348,3 @@ class OptimizedOnkoPipeline:
             f"issues={metrics.get('final_issues_count', 0)}"
         )
         logger.info(perf_summary)
-

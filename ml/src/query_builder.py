@@ -1,6 +1,6 @@
 from .schemas import InputData
 from typing import List, Dict, Set
-
+from .nosology_map import get_all_synonyms
 
 class QueryExpansion:
     """
@@ -194,16 +194,44 @@ def build_query_from_input(input_data: InputData, use_expansion: bool = True) ->
 
     parts.append("Лечение: " + "; ".join(therapy_parts))
 
-    # Свободный текст (если есть)
+    # Свободный текст
     if input_data.free_text:
         if input_data.free_text.doctor_notes:
             parts.append(f"Примечания врача: {input_data.free_text.doctor_notes}")
         if input_data.free_text.patient_message:
             parts.append(f"Сообщение пациента: {input_data.free_text.patient_message}")
 
+    # Собираем базовый запрос
     query = ". ".join(parts)
 
-    # Дополнительное расширение для ключевых комбинаций
+    # 1. Добавляем нозологию в начало (строгий матч)
+    nosology = input_data.diagnosis.name.lower().strip() if input_data.diagnosis.name else ""
+    nosology = input_data.diagnosis.name
+    if nosology:
+        synonyms = get_all_synonyms(nosology)
+        if len(synonyms) > 1:
+            query = f"({' OR '.join(synonyms)}): {query}"
+
+    # 2. Собираем целевые расширения на основе маркеров и заметок
+    targeted_expansions = []
+
+    # Для молекулярных маркеров
+    if input_data.molecular_markers:
+        if input_data.molecular_markers.EGFR:
+            targeted_expansions.append(f"EGFR mutation {input_data.molecular_markers.EGFR}")
+        if input_data.molecular_markers.ALK:
+            targeted_expansions.append(f"ALK rearrangement {input_data.molecular_markers.ALK}")
+        if input_data.molecular_markers.PD_L1:
+            targeted_expansions.append(f"PD-L1 expression {input_data.molecular_markers.PD_L1}")
+
+    # Для прогрессии (если в notes есть слово "прогрессирование")
+    if input_data.treatment.notes and "прогрессирование" in input_data.treatment.notes.lower():
+        targeted_expansions.append("after progression on previous line")
+
+    if targeted_expansions:
+        query += " [" + ", ".join(targeted_expansions) + "]"
+
+    # Дополнительное контекстуальное расширение (можно оставить твоё)
     if use_expansion:
         query = _add_contextual_expansions(query, input_data)
 

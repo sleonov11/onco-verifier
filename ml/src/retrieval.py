@@ -1,20 +1,22 @@
+# src/retrieval.py
 import json
 import hashlib
 import chromadb
 from chromadb.utils import embedding_functions
 from rank_bm25 import BM25Okapi
-import numpy as np
 from typing import List, Tuple, Optional, Dict
 from .config import CHROMA_PERSIST_DIR, logger
 from .models import EmbeddingModel
+from .nosology_map import get_all_synonyms, get_nosology_group
 
 
 class OptimizedGuidelineRetriever:
     """
-    retriever с:
-    - Фильтрацией по метаданным в Chroma
-    - Умным fallback на полный поиск при пустых результатах
-    - Кэшированием частых запросов
+    Гибридный поиск с:
+    - Фильтрацией по метаданным (с поддержкой $or, $contains)
+    - Умным fallback (ослабление фильтра, затем без фильтра)
+    - Кэшированием запросов
+    - Порогом отсечения по скору
     """
 
     def __init__(self, collection_name="clinical_guidelines"):
@@ -24,7 +26,7 @@ class OptimizedGuidelineRetriever:
         self._query_cache = {}
         self._cache_hits = 0
 
-        # Подключение к коллекции
+        # Подключаемся к коллекции
         try:
             self.collection = self.chroma_client.get_collection(name=collection_name)
             logger.info(f"Loaded existing collection '{collection_name}'")
@@ -34,22 +36,32 @@ class OptimizedGuidelineRetriever:
                 self.collection = self.chroma_client.create_collection(
                     name=collection_name,
                     embedding_function=embedding_functions.SentenceTransformerEmbeddingFunction(
-                        model_name="intfloat/multilingual-e5-large-instruct"
+                        model_name=self.embed_model.model_name,
+                        device=self.embed_model.device
                     )
                 )
             else:
                 raise
 
-        self.bm25_index: Optional[BM25Okapi] = None
-        self.doc_texts: List[str] = []
-        self.doc_ids: List[str] = []
-        self.doc_metadatas: List[dict] = []
+        # Загружаем документы для BM25
+        try:
+            all_docs = self.collection.get(include=["documents", "metadatas"])
+            self.doc_texts = all_docs["documents"]
+            self.doc_metadatas = all_docs["metadatas"]
+            self.doc_ids = all_docs["ids"]
+            self.bm25_index = BM25Okapi([t.split() for t in self.doc_texts])
+            logger.info(f"Loaded {len(self.doc_texts)} documents for BM25")
+        except Exception as e:
+            logger.warning(f"Could not load documents for BM25 (collection may be empty): {e}")
+            self.doc_texts = []
+            self.doc_metadatas = []
+            self.doc_ids = []
+            self.bm25_index = None
 
-        # Индексы для быстрой фильтрации BM25
-        self.metadata_index: Dict[str, Dict[str, set]] = {}  # {field: {value: set(indices)}}
+        self.metadata_index: Dict[str, Dict[str, set]] = {}  # для быстрой фильтрации BM25
 
     def index_chunks(self, chunks_file: str):
-        """Индексация с построением вспомогательных индексов"""
+        """Индексация из JSONL-файла (используется при первоначальной загрузке)."""
         texts = []
         ids = []
         metadatas = []
@@ -64,7 +76,7 @@ class OptimizedGuidelineRetriever:
                 ids.append(doc_id)
                 metadatas.append(metadata)
 
-        # Добавляем в Chroma батчами
+        # Загружаем в Chroma батчами
         batch_size = 100
         for i in range(0, len(texts), batch_size):
             end = min(i + batch_size, len(texts))
@@ -75,24 +87,20 @@ class OptimizedGuidelineRetriever:
             )
             logger.info(f"Added batch {i//batch_size + 1}/{(len(texts)-1)//batch_size + 1} to Chroma")
 
-        # Сохраняем для BM25 и строим индексы
+        # Обновляем локальные данные для BM25
         self.doc_texts = texts
         self.doc_ids = ids
         self.doc_metadatas = metadatas
         self.bm25_index = BM25Okapi([text.split() for text in texts])
-
         self._build_metadata_index()
-
         logger.info(f"BM25 index built with {len(texts)} documents")
-        logger.info(f"Metadata fields indexed: {list(self.metadata_index.keys())}")
 
     def _build_metadata_index(self):
-        """Строит инвертированные индексы по метаданным для BM25"""
+        """Индекс для быстрой фильтрации BM25 по метаданным."""
         for idx, metadata in enumerate(self.doc_metadatas):
             for field, value in metadata.items():
                 if isinstance(value, list):
                     continue
-
                 if field not in self.metadata_index:
                     self.metadata_index[field] = {}
                 if value not in self.metadata_index[field]:
@@ -100,17 +108,13 @@ class OptimizedGuidelineRetriever:
                 self.metadata_index[field][value].add(idx)
 
     def _bm25_search(self, query: str, top_k: int, metadata_filters: Optional[Dict] = None) -> List[Tuple[str, float, int]]:
-        """
-        BM25 с возможностью фильтрации по метаданным.
-        При фильтрации ищем только в подходящих документах.
-        """
+        """BM25 поиск с фильтрацией по метаданным (только простые равенства)."""
         if not self.bm25_index:
             return []
 
-        # Определяем кандидатов для поиска
         candidate_indices = None
         if metadata_filters:
-            # Пересечение множеств по всем фильтрам
+            # Фильтрация через пересечение множеств
             for field, value in metadata_filters.items():
                 if field in self.metadata_index and value in self.metadata_index[field]:
                     if candidate_indices is None:
@@ -118,35 +122,27 @@ class OptimizedGuidelineRetriever:
                     else:
                         candidate_indices &= self.metadata_index[field][value]
                 else:
-                    return []
+                    return []  # нет документов с таким значением
 
             if not candidate_indices:
                 return []
 
-        # Получаем скоры для всех документов
         tokenized_query = query.split()
         all_scores = self.bm25_index.get_scores(tokenized_query)
 
-        # Фильтруем если нужно
         if candidate_indices is not None:
-            scored_candidates = [(i, all_scores[i]) for i in candidate_indices if all_scores[i] > 0]
+            scored = [(i, all_scores[i]) for i in candidate_indices if all_scores[i] > 0]
         else:
-            scored_candidates = [(i, score) for i, score in enumerate(all_scores) if score > 0]
+            scored = [(i, all_scores[i]) for i, score in enumerate(all_scores) if score > 0]
 
-        # Сортируем и берем топ-k
-        scored_candidates.sort(key=lambda x: x[1], reverse=True)
-        top_indices = scored_candidates[:top_k]
-
+        scored.sort(key=lambda x: x[1], reverse=True)
+        top_indices = scored[:top_k]
         return [(self.doc_texts[i], score, i) for i, score in top_indices]
 
     def _chroma_search(self, query: str, top_k: int, metadata_filters: Optional[Dict] = None) -> List[Tuple[str, float, dict, str]]:
-        """Chroma с фильтрацией по метаданным через where clause"""
+        """Векторный поиск в Chroma с поддержкой сложных фильтров."""
         query_emb = self.embed_model.encode_queries([query])[0]
-
-        # Формируем where clause для Chroma
         where_clause = self._build_where_clause(metadata_filters)
-
-        # Запрашиваем с запасом, т.к. фильтр может сильно сократить выборку
         n_results = top_k * 3 if metadata_filters else top_k
 
         results = self.collection.query(
@@ -160,13 +156,14 @@ class OptimizedGuidelineRetriever:
         metadatas = results['metadatas'][0] if results['metadatas'] else []
         distances = results['distances'][0] if results['distances'] else []
         ids = results['ids'][0] if results['ids'] else []
-
         return list(zip(documents, distances, metadatas, ids))[:top_k]
 
     def _build_where_clause(self, metadata_filters: Optional[Dict]) -> Optional[Dict]:
-        """Строит where clause для Chroma из фильтров"""
+        """Преобразует словарь фильтров в where-clause для Chroma."""
         if not metadata_filters:
             return None
+        if "$or" in metadata_filters or "$and" in metadata_filters:
+            return metadata_filters
 
         conditions = []
         for key, value in metadata_filters.items():
@@ -175,71 +172,163 @@ class OptimizedGuidelineRetriever:
 
         if not conditions:
             return None
-        elif len(conditions) == 1:
+        if len(conditions) == 1:
             return conditions[0]
-        else:
-            return {"$and": conditions}
+        return {"$and": conditions}
 
     def search(self, query_text: str, metadata_filters: Optional[Dict] = None,
                top_k: int = 20, bm25_weight: float = 0.3,
-               use_cache: bool = True) -> List[Tuple[str, dict, float, str]]:
+               use_cache: bool = True, score_threshold: float = 0.6) -> List[Tuple[str, dict, float, str]]:
         """
-        Гибридный поиск с фильтрацией и кэшированием.
+        Основной метод гибридного поиска.
 
-        Стратегия:
-        1. Если есть фильтры — применяем к обеим системам
-        2. Если после фильтрации мало результатов — пробуем поиск без фильтров
-        3. Объединяем через взвешенную сумму
+        Args:
+            query_text: текст запроса
+            metadata_filters: фильтры по метаданным (могут содержать "nosology")
+            top_k: сколько результатов вернуть
+            bm25_weight: вес BM25 (0..1)
+            use_cache: использовать кэш
+            score_threshold: минимальный итоговый скор (0..1)
+
+        Returns:
+            список кортежей (текст, метаданные, скор, doc_id)
         """
-        # Проверка кэша
-        cache_key = f"{query_text}|{str(metadata_filters)}|{top_k}"
+        cache_key = f"{query_text}|{str(metadata_filters)}|{top_k}|{bm25_weight}|{score_threshold}"
         if use_cache and cache_key in self._query_cache:
             self._cache_hits += 1
             logger.debug(f"Cache hit ({self._cache_hits} total)")
             return self._query_cache[cache_key]
 
-        # Поиск с фильтрами
-        bm25_results = self._bm25_search(query_text, top_k, metadata_filters)
-        chroma_results = self._chroma_search(query_text, top_k, metadata_filters)
+        query_emb = self.embed_model.encode_queries([query_text])[0]
 
-        # Fallback: если фильтры слишком агрессивны и нет результатов
-        if metadata_filters and (not bm25_results or not chroma_results):
-            logger.warning(f"Filtered search returned few results, trying without filters")
-            bm25_results = self._bm25_search(query_text, top_k, None)
-            chroma_results = self._chroma_search(query_text, top_k, None)
+        # --- УНИВЕРСАЛЬНЫЙ РАСШИРЕННЫЙ ФИЛЬТР ПО НОЗОЛОГИИ ---
+        original_filters = metadata_filters.copy() if metadata_filters else None
+        if metadata_filters and "nosology" in metadata_filters:
+            nosology = metadata_filters.pop("nosology")
+            synonyms = get_all_synonyms(nosology)
 
-        # Объединение результатов
+            if synonyms:
+                or_conditions = []
+                # Точные совпадения
+                for syn in synonyms:
+                    or_conditions.append({"nosology": {"$eq": syn}})
+                # Частичные совпадения (по последнему слову и целой фразе)
+                for syn in synonyms:
+                    last_word = syn.split()[-1]
+                    if len(last_word) > 3:
+                        or_conditions.append({"nosology": {"$contains": last_word}})
+                        or_conditions.append({"source": {"$contains": last_word}})
+                    if len(syn) > 4:
+                        or_conditions.append({"nosology": {"$contains": syn.lower()}})
+                        or_conditions.append({"source": {"$contains": syn.lower()}})
+                # Группа (если есть поле nosology_group)
+                group = get_nosology_group(nosology)
+                if group and group != nosology:
+                    or_conditions.append({"nosology_group": {"$contains": group.split()[-1]}})
+                    or_conditions.append({"nosology_group": {"$eq": group}})
+
+                metadata_filters = {"$or": or_conditions}
+                logger.info(f"[RELAXED OR FILTER] Created {len(or_conditions)} conditions for nosology '{nosology}'")
+            else:
+                # Если синонимов нет, возвращаем как было
+                metadata_filters["nosology"] = nosology
+
+        # --- ОПРЕДЕЛЯЕМ СЛОЖНОСТЬ ФИЛЬТРА ДЛЯ BM25 ---
+        has_complex_ops = metadata_filters and ("$or" in metadata_filters or "$and" in metadata_filters)
+
+        if has_complex_ops:
+            logger.debug("[SEARCH] Complex filter detected, using Chroma-only search")
+            bm25_results = []
+        else:
+            bm25_results = self._bm25_search(query_text, top_k, metadata_filters)
+
+        # --- CHROMA ПОИСК ---
+        chroma_results = self.collection.query(
+            query_embeddings=[query_emb.tolist()],
+            n_results=top_k * 2,
+            where=metadata_filters,
+            include=['documents', 'metadatas', 'distances']
+        )
+
+        # Логируем найденные нозологии
+        if chroma_results['metadatas'] and chroma_results['metadatas'][0]:
+            found = [m.get('nosology', '—') for m in chroma_results['metadatas'][0]]
+            logger.info(f"[FOUND NOSOLOGIES] {set(found)}")
+
+        # --- УМНЫЙ FALLBACK (пошаговое ослабление фильтра) ---
+        if len(chroma_results['documents'][0]) == 0 and original_filters and "nosology" in original_filters:
+            logger.warning("[FALLBACK] No results with full OR filter, trying partial match by group")
+            group = get_nosology_group(original_filters["nosology"])
+            if group:
+                last_word = group.split()[-1]
+                fallback_filter = {"$or": [
+                    {"nosology": {"$contains": last_word}},
+                    {"source": {"$contains": last_word}}
+                ]}
+                chroma_results = self.collection.query(
+                    query_embeddings=[query_emb.tolist()],
+                    n_results=top_k * 2,
+                    where=fallback_filter,
+                    include=['documents', 'metadatas', 'distances']
+                )
+                logger.info(f"[FALLBACK] Partial filter applied: {fallback_filter}")
+
+        # --- ПОЛНЫЙ FALLBACK (без фильтра) ---
+        if len(chroma_results['documents'][0]) == 0:
+            logger.warning("[FALLBACK] Still no results, searching without any nosology filter")
+            chroma_results = self.collection.query(
+                query_embeddings=[query_emb.tolist()],
+                n_results=top_k * 2,
+                where=None,
+                include=['documents', 'metadatas', 'distances']
+            )
+
+        # --- ОБЪЕДИНЕНИЕ РЕЗУЛЬТАТОВ (Chroma + BM25) ---
         combined_scores = {}
         doc_info = {}
 
-        # BM25: нормализуем скоры (максимум ~10-15 для длинных документов)
+        # Chroma
+        chroma_chunks = list(zip(
+            chroma_results['documents'][0] if chroma_results['documents'] else [],
+            chroma_results['distances'][0] if chroma_results['distances'] else [],
+            chroma_results['metadatas'][0] if chroma_results['metadatas'] else [],
+            chroma_results['ids'][0] if chroma_results['ids'] else []
+        ))
+
+        for text, dist, meta, doc_id in chroma_chunks:
+            score = 1 / (1 + dist)  # преобразуем расстояние в скор
+            combined_scores[doc_id] = combined_scores.get(doc_id, 0) + (1 - bm25_weight) * score
+            doc_info[doc_id] = (text, meta)
+
+        # BM25
         if bm25_results:
-            max_bm25 = max(score for _, score, _ in bm25_results) if bm25_results else 1.0
+            max_bm25 = max(s for _, s, _ in bm25_results) if bm25_results else 1.0
             for text, score, idx in bm25_results:
                 doc_id = self.doc_ids[idx]
-                normalized_score = score / max_bm25 if max_bm25 > 0 else 0
-                combined_scores[doc_id] = combined_scores.get(doc_id, 0) + bm25_weight * normalized_score
+                norm_score = score / max_bm25
+                combined_scores[doc_id] = combined_scores.get(doc_id, 0) + bm25_weight * norm_score
                 doc_info[doc_id] = (text, self.doc_metadatas[idx])
 
-        # Chroma расстояние косинусное → скор (0..1)
-        for text, dist, meta, doc_id in chroma_results:
-            score = 1 / (1 + dist)  # чем меньше расстояние, тем выше скор
-            combined_scores[doc_id] = combined_scores.get(doc_id, 0) + (1 - bm25_weight) * score
-            if doc_id not in doc_info:  # BM25 мог уже добавить
-                doc_info[doc_id] = (text, meta)
-
-        # Сортируем по убыванию комбинированного скора
-        sorted_docs = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)[:top_k]
+        # Сортируем и отсекаем по порогу
+        sorted_docs = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
         result = []
         for doc_id, score in sorted_docs:
+            if score < score_threshold:
+                continue
             text, meta = doc_info[doc_id]
             result.append((text, meta, score, doc_id))
+            if len(result) >= top_k:
+                break
 
-        # Сохраняем в кэш
+        # Если после всех попыток результат пуст – повторяем без фильтра (на всякий случай)
+        if not result and original_filters:
+            logger.warning("[FINAL FALLBACK] No results after all attempts, retrying without any filters")
+            return self.search(query_text, None, top_k, bm25_weight, use_cache, score_threshold)
+
+        # Кэшируем
         if use_cache:
             if len(self._query_cache) > 1000:
                 self._query_cache.clear()
             self._query_cache[cache_key] = result
 
         return result
-
