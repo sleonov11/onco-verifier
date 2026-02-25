@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import time
 import json
+from typing import Dict
 
 from .schemas import CheckRequest, CheckResponse
 from .pipeline import OptimizedOnkoPipeline

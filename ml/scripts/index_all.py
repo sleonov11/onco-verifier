@@ -56,6 +56,25 @@ def main():
     texts = [c["text"] for c in all_chunks]
     metadatas = [c["metadata"] for c in all_chunks]
     ids = [c["id"] for c in all_chunks]
+    # Устранение дубликатов ID (Chroma требует уникальности)
+    from collections import Counter
+    id_counts = Counter(ids)
+    if len(id_counts) != len(ids):
+        duplicates = [id_ for id_, cnt in id_counts.items() if cnt > 1]
+        logger.warning(f"Found {len(ids) - len(id_counts)} duplicate IDs (first few: {duplicates[:5]}), adding suffixes")
+        seen = {}
+        new_ids = []
+        for i, orig_id in enumerate(ids):
+            if orig_id in seen:
+                seen[orig_id] += 1
+                new_id = f"{orig_id}_{seen[orig_id]}"
+                new_ids.append(new_id)
+                logger.debug(f"Duplicated ID {orig_id} -> {new_id}")
+            else:
+                seen[orig_id] = 1
+                new_ids.append(orig_id)
+        ids = new_ids
+        logger.info(f"Unique IDs after fix: {len(set(ids))}")
 
     retriever = OptimizedGuidelineRetriever()
 
