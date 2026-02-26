@@ -205,6 +205,14 @@ class OptimizedGuidelineRetriever:
         original_filters = metadata_filters.copy() if metadata_filters else None
         if metadata_filters and "nosology" in metadata_filters:
             nosology = metadata_filters.pop("nosology")
+
+            # nosology может прийти как {"$eq": "рак легких"} или просто "рак легких"
+            if isinstance(nosology, dict):
+                nosology = nosology.get("$eq") or nosology.get("$contains") or ""
+            if not isinstance(nosology, str):
+                nosology = str(nosology)
+            nosology = nosology.strip()
+
             synonyms = get_all_synonyms(nosology)
 
             if synonyms:

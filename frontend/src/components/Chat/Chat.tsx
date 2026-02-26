@@ -52,10 +52,16 @@ export const Chat = observer(function Chat({
         }
     };
 
+    if (chatStore.messages.length == 0) {
+        return null;
+    }
+
     return (
         <Card
             title={title}
-            bodyStyle={{ display: "flex", flexDirection: "column", gap: 12 }}
+            styles={{
+                body: { display: "flex", flexDirection: "column", gap: 12 },
+            }}
             extra={
                 <Popconfirm
                     title="Очистить историю?"
@@ -87,7 +93,7 @@ export const Chat = observer(function Chat({
                 {chatStore.messages.length === 0 ? (
                     <Empty description="Пока нет сообщений" />
                 ) : (
-                    <Space direction="vertical" style={{ width: "100%" }} size={10}>
+                    <Space orientation="vertical" style={{ width: "100%" }} size={10}>
                         {chatStore.messages.map((m) => {
                             const isUser = m.role === "user";
                             return (

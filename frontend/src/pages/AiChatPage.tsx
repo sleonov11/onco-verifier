@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Alert,
   Button,
@@ -8,10 +8,8 @@ import {
   Form,
   Input,
   InputNumber,
-  Radio,
   Select,
   Space,
-  Tag,
   Typography,
   message,
 } from 'antd';
@@ -19,24 +17,23 @@ import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import type { Role } from '../shared/types';
-import { ROLE_LABEL } from '../shared/types';
 import { streamText } from '../shared/stream';
 
-import { postCheck } from "../shared/api";
+import {postChat, postCheck } from "../shared/api";
 import { Chat } from "../components/Chat/Chat";
 import {chatStore} from "../stores/chat.ts";
 import {userStore} from "../stores/user.ts";
+import {formatResponse} from "../shared/utils.ts";
 
 const { Text, Title } = Typography;
 
-type GuidelineScope = 'ru_minzdrav' | 'intl' | 'mixed';
+// type GuidelineScope = 'ru_minzdrav' | 'intl' | 'mixed';
 
-const GUIDELINE_SCOPE_LABEL: Record<GuidelineScope, string> = {
-  ru_minzdrav: 'Минздрав РФ (приоритет)',
-  intl: 'NCCN/ESMO (международные)',
-  mixed: 'Смешанный (приоритет РФ)',
-};
+// const GUIDELINE_SCOPE_LABEL: Record<GuidelineScope, string> = {
+//   ru_minzdrav: 'Минздрав РФ (приоритет)',
+//   intl: 'NCCN/ESMO (международные)',
+//   mixed: 'Смешанный (приоритет РФ)',
+// };
 
 const sexOptions = [
   { label: 'Мужской', value: 'male' },
@@ -192,20 +189,20 @@ export function AiChatPage() {
   });
 
   const role = watch('role');
-  const guidelineScope = watch('options.guideline_scope');
+  // const guidelineScope = watch('options.guideline_scope');
 
-  const roleHint = useMemo(() => {
-    const r: Role = role;
-    return r === 'doctor'
-      ? 'Режим врача: структурированные поля + клиническая терминология.'
-      : 'Режим пациента: минимальные поля + объяснение простыми словами.';
-  }, [role]);
-
-  const scopeHint = useMemo(() => {
-    if (guidelineScope === 'ru_minzdrav') return 'Ответ будет опираться на клинические рекомендации Минздрава РФ.';
-    if (guidelineScope === 'intl') return 'Ответ будет опираться на международные гайдлайны (NCCN/ESMO).';
-    return 'Ответ может использовать оба источника, приоритет — Минздрав РФ.';
-  }, [guidelineScope]);
+  // const roleHint = useMemo(() => {
+  //   const r: Role = role;
+  //   return r === 'doctor'
+  //     ? 'Режим врача: структурированные поля + клиническая терминология.'
+  //     : 'Режим пациента: минимальные поля + объяснение простыми словами.';
+  // }, [role]);
+  //
+  // const scopeHint = useMemo(() => {
+  //   if (guidelineScope === 'ru_minzdrav') return 'Ответ будет опираться на клинические рекомендации Минздрава РФ.';
+  //   if (guidelineScope === 'intl') return 'Ответ будет опираться на международные гайдлайны (NCCN/ESMO).';
+  //   return 'Ответ может использовать оба источника, приоритет — Минздрав РФ.';
+  // }, [guidelineScope]);
 
   const stopStreaming = () => {
     abortRef.current?.abort();
@@ -230,8 +227,16 @@ export function AiChatPage() {
         abortRef.current.signal
       );
 
-      console.log(apiResp)
+      console.log(apiResp);
 
+      const formatted = formatResponse(apiResp, userStore.role);
+      chatStore.addAssistantMessage(formatted);
+
+      await streamText(
+        formatted,
+        (chunk) => setAnswer((prev) => prev + chunk),
+        { chunkSize: 6, delayMs: 18, signal: abortRef.current.signal }
+      );
 
       const full = JSON.stringify(apiResp, null, 2);
 
@@ -635,23 +640,41 @@ export function AiChatPage() {
       {/*    <Text type="secondary">Пока пусто. Заполни поля и нажми «Проверить» — тут появится ответ.</Text>*/}
       {/*  )}*/}
       {/*</Card>*/}
-        {chatStore.messages.length > 0 && <Chat
-            title="AI-диалог"
-            onSend={async (_) => {
-                // сюда логика запроса к backend
-                const data: ParsedValues = schema.parse(watch());
+        {chatStore.messages.length > 0 &&
 
-                const apiResp = await postCheck(
-                    {
-                        role: data.role,
-                        locale: data.locale,
-                        input: data.input,
-                    }
-                );
+            <Chat
+                title="Диалог"
+                onSend={async (userText: string) => {
 
-                chatStore.addAssistantMessage(JSON.stringify(apiResp, null, 2));
-            }}
-        />}
+                    // 2) сохраняем роль doctor/patient из формы (или из userStore)
+                    const data: ParsedValues = schema.parse(watch());
+                    const doctorPatientRole = data.role; // "doctor" | "patient"
+
+                    // 3) history для API
+                    const history = chatStore.messages.map((m) => ({
+                        role: m.role,          // "user" | "assistant"
+                        content: m.content,       // текст сообщения
+                    }));
+
+                    // 4) отправляем запрос в диалоговый endpoint
+                    const apiResp = await postChat({
+                        request_id: chatStore.requestId,   // можешь хранить один requestId для диалога
+                        message: userText,
+                        role: doctorPatientRole,
+                        history,
+                        context: {
+                            // можно прокинуть контекст основного запроса:
+                            input: data.input,
+                            options: data.options,
+                            locale: data.locale,
+                        },
+                    });
+
+                    // 5) добавляем ответ ассистента
+                    chatStore.addAssistantMessage(apiResp.message);
+                }}
+            />
+        }
     </Space>
   );
 }

@@ -38,7 +38,7 @@ export const AppHeader = observer(
                 >
                     {/* Левый блок */}
                     <Text style={{ color: "white", fontWeight: 600 }}>
-                        AI Project
+                        Onco AI Project
                     </Text>
 
                     {/* Центр */}

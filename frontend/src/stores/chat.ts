@@ -11,6 +11,7 @@ export interface ChatMessage {
 
 class ChatStore {
     messages: ChatMessage[] = [];
+    requestId = crypto.randomUUID();
 
     private STORAGE_KEY = "onco_chat";
 

@@ -137,6 +137,12 @@ def get_nosology_group(nosology: str) -> str:
     if not nosology:
         return ""
 
+    if isinstance(nosology, dict):
+        nosology = nosology.get("$eq", "")
+
+    if not isinstance(nosology, str):
+        nosology = str(nosology)
+
     nos = nosology.lower().strip()
 
     for group, synonyms in NOSOLOGY_GROUPS.items():
