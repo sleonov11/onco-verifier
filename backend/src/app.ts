@@ -4,6 +4,7 @@ import { errorMiddleware } from "./middlewares/error";
 import {checkRouter} from "./routes/check";
 import cors from "cors";
 import {surveyRouter} from "./routes/survey";
+import { chatRouter } from "./routes/chat";
 
 export function createApp(): Express {
   const app = express();
@@ -22,6 +23,7 @@ export function createApp(): Express {
   app.use("/api", healthRouter);
   app.use("/api", checkRouter);
   app.use('/api', surveyRouter);
+  app.use("/api", chatRouter);
 
   app.get("/", (_req: Request, res: Response) => {
     res.send("OK");

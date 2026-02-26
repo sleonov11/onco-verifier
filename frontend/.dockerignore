@@ -1,0 +1,8 @@
+node_modules
+dist
+build
+.vite
+.git
+.idea
+.vscode
+.DS_Store

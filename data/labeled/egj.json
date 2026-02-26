@@ -1,0 +1,326 @@
+[
+  {
+  "source": {
+    "guideline": "Рак желудка. Клинические рекомендации RUSSCO, 2025",
+    "section": "3.2.3. Тактика лекарственной терапии при прогрессировании болезни",
+    "page": 306,
+    "country": "ru"
+  },
+  "metadata": {
+    "nosology": "Рак пищеводно-желудочного перехода",
+    "icd10": "C16.0",
+    "stage": "IV",
+    "histology": "аденокарцинома",
+    "molecular_markers": {
+      "HER2": "негативный",
+      "PD-L1": "CPS=3",
+      "MSS": "да"
+    },
+    "therapy_line": 2,
+    "treatment_schema": "Рамуцирумаб + паклитаксел (предпочтительно)",
+    "evidence_level": "МКЗ I-D1",
+    "priority": 10
+  },
+  "rule": {
+    "condition": {
+      "прогрессирование": "на фоне I линии",
+      "ECOG": "0-2",
+      "HER2": "негативный"
+    },
+    "recommendation": "Комбинация рамуцирумаба с паклитакселом является предпочтительной II линии. При полинейропатии или прогрессии на таксанах возможно рамуцирумаб + иринотекан или FOLFIRI.",
+    "recommendation_type": "preferred",
+    "confidence": "high"
+  },
+  "text": {
+    "doctor_version": "Согласно результатам рандомизированных исследований применение рамуцирумаба в комбинации с паклитакселом (МКЗ I–D1) статистически значимо увеличивает общую выживаемость по сравнению с паклитакселом. При полинейропатии возможно рамуцирумаб + иринотекан или FOLFIRI.",
+    "patient_version": "Во второй линии рекомендуется рамуцирумаб с паклитакселом для продления жизни. Если нервы повреждены, можно заменить на иринотекан.",
+    "original_guideline_text": "Комбинация рамуцирумаба с паклитакселом является предпочтительной комбинацией II линии. При наличии полинейропатии возможно назначение комбинации рамуцирумаба с иринотеканом или режимом FOLFIRI."
+  }
+},
+  {
+  "source": {
+    "guideline": "Рак желудка. Клинические рекомендации RUSSCO, 2025",
+    "section": "3.2.3. Рекомендуемые режимы II линии",
+    "page": 307,
+    "country": "ru"
+  },
+  "metadata": {
+    "nosology": "Рак пищеводно-желудочного перехода",
+    "icd10": "C16.0",
+    "stage": "IV",
+    "histology": "аденокарцинома",
+    "molecular_markers": {},
+    "therapy_line": 2,
+    "treatment_schema": "Рамуцирумаб + иринотекан",
+    "evidence_level": "МКЗ I-D1",
+    "priority": 8
+  },
+  "rule": {
+    "condition": {
+      "прогрессирование": "на фоне таксанов",
+      "ECOG": "0-2"
+    },
+    "recommendation": "Рамуцирумаб 8 мг/кг в/в 1 день + Иринотекан 150–180 мг/м² в/в 1 день каждые 14 дней.",
+    "recommendation_type": "alternative",
+    "confidence": "medium"
+  },
+  "text": {
+    "doctor_version": "При прогрессии на таксанах возможно рамуцирумаб + иринотекан: рамуцирумаб 8 мг/кг в/в + иринотекан 150–180 мг/м² в/в каждые 14 дней.",
+    "patient_version": "Если предыдущее лечение не помогло, можно комбинировать рамуцирумаб с иринотеканом каждые 2 недели.",
+    "original_guideline_text": "Рамуцирумаб + Иринотекан: 8 мг/кг в/в 1, 15 дни + 150–180 мг/м² в/в 1, 15 дни каждые 28 дней."
+  }
+},
+  {
+  "source": {
+    "guideline": "NCCN Guidelines for Esophageal and Esophagogastric Junction Cancers, Version 2.2025",
+    "section": "Management of Recurrent or Metastatic Disease",
+    "page": null,
+    "country": "us"
+  },
+  "metadata": {
+    "nosology": "Рак пищеводно-желудочного перехода",
+    "icd10": "C16.0",
+    "stage": "IV",
+    "histology": "аденокарцинома",
+    "molecular_markers": {"HER2": "негативный"},
+    "therapy_line": 2,
+    "treatment_schema": "Рамуцирумаб + паклитаксел",
+    "evidence_level": "category 1",
+    "priority": 10
+  },
+  "rule": {
+    "condition": {
+      "прогрессирование": "после первой линии с платина/фторпиримидинами"
+    },
+    "recommendation": "Рамуцирумаб + паклитаксел является предпочтительной опцией второй линии для пациентов с прогрессирующей аденокарциномой EGJ.",
+    "recommendation_type": "preferred",
+    "confidence": "high"
+  },
+  "text": {
+    "doctor_version": "Рамуцирумаб + паклитаксел (category 1, preferred) для второй линии терапии у пациентов с продвинутой или метастатической аденокарциномой EGJ, рефрактерной к первой линии.",
+    "patient_version": "Комбинация рамуцирумаба и паклитаксела рекомендуется как лучший вариант второй линии для контроля заболевания.",
+    "original_guideline_text": "Ramucirumab plus paclitaxel (category 1, preferred) as treatment options for second-line or subsequent therapy in patients with advanced or metastatic gastric adenocarcinoma."
+  }
+},
+  {
+  "source": {
+    "guideline": "NCCN Guidelines for Esophageal and Esophagogastric Junction Cancers, Version 2.2025",
+    "section": "Management of Recurrent or Metastatic Disease",
+    "page": null,
+    "country": "us"
+  },
+  "metadata": {
+    "nosology": "Рак пищеводно-желудочного перехода",
+    "icd10": "C16.0",
+    "stage": "IV",
+    "histology": "аденокарцинома",
+    "molecular_markers": {},
+    "therapy_line": 2,
+    "treatment_schema": "Рамуцирумаб + иринотекан или FOLFIRI",
+    "evidence_level": "category 2A",
+    "priority": 8
+  },
+  "rule": {
+    "condition": {
+      "прогрессирование": "на фоне таксанов"
+    },
+    "recommendation": "Рамуцирумаб + иринотекан или FOLFIRI как альтернатива второй линии.",
+    "recommendation_type": "other recommended",
+    "confidence": "medium"
+  },
+  "text": {
+    "doctor_version": "Рамуцирумаб в комбинации с иринотеканом или FOLFIRI (category 2A) для второй линии терапии после прогрессии.",
+    "patient_version": "Если паклитаксел не подходит, можно использовать рамуцирумаб с иринотеканом.",
+    "original_guideline_text": "Ramucirumab combined with irinotecan or FOLFIRI is a category 2A other recommended option for second-line or subsequent therapy."
+  }
+},
+  {
+  "source": {
+    "guideline": "RINDBeRG Trial, JCO 2025",
+    "section": "Results",
+    "page": null,
+    "country": "international"
+  },
+  "metadata": {
+    "nosology": "Рак пищеводно-желудочного перехода",
+    "icd10": "C16.0",
+    "stage": "IV",
+    "histology": "аденокарцинома",
+    "molecular_markers": {},
+    "therapy_line": 3,
+    "treatment_schema": "Иринотекан моно (не продолжать рамуцирумаб)",
+    "evidence_level": "phase III",
+    "priority": 10
+  },
+  "rule": {
+    "condition": {
+      "прогрессирование": "на фоне рамуцирумаб-содержащей терапии"
+    },
+    "recommendation": "Добавление рамуцирумаба к иринотекану не дает значимого преимущества в OS по сравнению с иринотеканом моно (HR 0.91, P=0.49).",
+    "recommendation_type": "not recommended to continue",
+    "confidence": "high"
+  },
+  "text": {
+    "doctor_version": "В RINDBeRG trial продолжение рамуцирумаба с иринотеканом после прогрессии на рамуцирумаб-содержащей терапии не улучшает OS (9.4 vs 8.5 мес, HR 0.91). PFS лучше (3.8 vs 2.8 мес, HR 0.72), но без перевода в OS.",
+    "patient_version": "Исследование показало, что продолжение рамуцирумаба с иринотеканом не продлевает жизнь дольше, чем иринотекан один.",
+    "original_guideline_text": "Ramucirumab plus irinotecan did not improve overall survival compared to irinotecan alone (median 9.4 vs 8.5 months; HR 0.91, P=0.49)."
+  }
+},
+  {
+  "source": {
+    "guideline": "Рак желудка. Клинические рекомендации RUSSCO, 2025",
+    "section": "3.2.3. Тактика лекарственной терапии при прогрессировании болезни",
+    "page": 306,
+    "country": "ru"
+  },
+  "metadata": {
+    "nosology": "Рак пищеводно-желудочного перехода",
+    "icd10": "C16.0",
+    "stage": "IV",
+    "histology": "аденокарцинома",
+    "molecular_markers": {"HER2": "позитивный"},
+    "therapy_line": 2,
+    "treatment_schema": "Трастузумаб дерукстекан",
+    "evidence_level": "МКЗ I-A1",
+    "priority": 9
+  },
+  "rule": {
+    "condition": {
+      "HER2": "положительный",
+      "прогрессирование": "на фоне трастузумаба"
+    },
+    "recommendation": "При прогрессировании на трастузумабе назначение трастузумаба дерукстекана увеличивает выживаемость.",
+    "recommendation_type": "preferred",
+    "confidence": "high"
+  },
+  "text": {
+    "doctor_version": "При HER2-позитивном статусе после прогрессии на трастузумабе трастузумаб дерукстекан (МКЗ I-A1) увеличивает медиану выживаемости с 8.9 до 12.5 мес.",
+    "patient_version": "Если опухоль HER2-положительная и предыдущее лечение не сработало, новый препарат трастузумаб дерукстекан может помочь дольше жить.",
+    "original_guideline_text": "При HER2-позитивном диссеминированном РЖ продолжение трастузумаба во II линии неэффективно, но трастузумаб дерукстекан (T-DXd) увеличивает выживаемость (медиана 12.5 vs 8.9 мес)."
+  }
+},
+  {
+  "source": {
+    "guideline": "Рак пищевода. Клинические рекомендации RUSSCO, 2025",
+    "section": "3.5. Клиническая стадия IV (M1)",
+    "page": null,
+    "country": "ru"
+  },
+  "metadata": {
+    "nosology": "Рак пищеводно-желудочного перехода",
+    "icd10": "C16.0",
+    "stage": "IV",
+    "histology": "аденокарцинома",
+    "molecular_markers": {},
+    "therapy_line": 2,
+    "treatment_schema": "Таксаны или иринотекан",
+    "evidence_level": "МКЗ",
+    "priority": 7
+  },
+  "rule": {
+    "condition": {
+      "гистология": "аденокарцинома",
+      "прогрессирование": "после первой линии"
+    },
+    "recommendation": "Лечение аденокарциномы пищевода и кардии во второй линии проводится в соответствии с рекомендациями по лечению рака желудка, включая монотерапию таксанами или иринотеканом.",
+    "recommendation_type": "alternative",
+    "confidence": "medium"
+  },
+  "text": {
+    "doctor_version": "Для аденокарциномы EGJ вторая линия — по рекомендациям рака желудка: монотерапия таксанами или иринотеканом после прогрессии.",
+    "patient_version": "Во второй линии можно использовать таксаны или иринотекан, как для рака желудка.",
+    "original_guideline_text": "Лечение аденокарциномы пищевода и кардии во второй и последующих линиях проводится в соответствии с действующими клиническими рекомендациями по лечению рака желудка."
+  }
+},
+  {
+  "source": {
+    "guideline": "Рак прямой кишки",
+    "section": "Лечение метастазов и паллиативная терапия",
+    "page": null,
+    "country": "ru"
+  },
+  "metadata": {
+    "nosology": "Рак пищеводно-желудочного перехода",
+    "icd10": "C16.0",
+    "stage": "IV",
+    "histology": "аденокарцинома",
+    "molecular_markers": {},
+    "therapy_line": 2,
+    "treatment_schema": "mFOLFOX6 или FOLFIRI (negative example)",
+    "evidence_level": null,
+    "priority": -5
+  },
+  "rule": {
+    "condition": {},
+    "recommendation": "Этот чанк из рекомендаций по раку прямой кишки не применим к EGJ аденокарциноме.",
+    "recommendation_type": "not_recommended",
+    "confidence": "high"
+  },
+  "text": {
+    "doctor_version": "Паллиативная химиотерапия для прямой кишки (mFOLFOX6, FOLFIRI) — не использовать для EGJ.",
+    "patient_version": "Это лечение для другого типа рака, не подходит.",
+    "original_guideline_text": "Паллиативная химиотерапия (метастатический, отсутствие RAS-мутаций): 1-я линия — mFOLFOX6, XELOX или FOLFIRI."
+  }
+},
+  {
+  "source": {
+    "guideline": "Немелкоклеточный рак легкого. Клинические рекомендации RUSSCO",
+    "section": "3.1.1. Принципы лечения пациентов с 0-IIIА стадиями НМРЛ",
+    "page": null,
+    "country": "ru"
+  },
+  "metadata": {
+    "nosology": "Рак пищеводно-желудочного перехода",
+    "icd10": "C16.0",
+    "stage": "IV",
+    "histology": "аденокарцинома",
+    "molecular_markers": {},
+    "therapy_line": 2,
+    "treatment_schema": "Адъювантная атезолизумаб (negative example)",
+    "evidence_level": "МКЗ 1-B1",
+    "priority": -5
+  },
+  "rule": {
+    "condition": {},
+    "recommendation": "Этот чанк из рекомендаций по раку лёгкого не применим к EGJ аденокарциноме.",
+    "recommendation_type": "not_recommended",
+    "confidence": "high"
+  },
+  "text": {
+    "doctor_version": "Адъювантная атезолизумаб для рака лёгкого — не использовать для EGJ.",
+    "patient_version": "Это лечение для рака лёгких, не подходит.",
+    "original_guideline_text": "У пациентов с II-III стадиями с экспрессией PD-L1 ≥1% адъювантная терапия атезолизумабом 1200 мг внутривенно каждые 3 недели в течение 1 года (МКЗ 1-B1)."
+  }
+},
+  {
+  "source": {
+    "guideline": "RINDBeRG Trial, JCO 2025",
+    "section": "Conclusion",
+    "page": null,
+    "country": "international"
+  },
+  "metadata": {
+    "nosology": "Рак пищеводно-желудочного перехода",
+    "icd10": "C16.0",
+    "stage": "IV",
+    "histology": "аденокарцинома",
+    "molecular_markers": {},
+    "therapy_line": 3,
+    "treatment_schema": "Иринотекан моно после прогрессии на рамуцирумабе",
+    "evidence_level": "phase III",
+    "priority": 10
+  },
+  "rule": {
+    "condition": {
+      "прогрессирование": "на фоне рамуцирумаб-содержащей терапии"
+    },
+    "recommendation": "Продолжение рамуцирумаба с иринотеканом не рекомендуется, так как не улучшает OS.",
+    "recommendation_type": "not_recommended",
+    "confidence": "high"
+  },
+  "text": {
+    "doctor_version": "RINDBeRG показал отсутствие значимого преимущества в OS для продолжения рамуцирумаба с иринотеканом (HR 0.91). Рекомендуется иринотекан моно или альтернативы.",
+    "patient_version": "Исследование RINDBeRG подтверждает, что лучше использовать иринотекан без рамуцирумаба после прогрессии.",
+    "original_guideline_text": "Continuation of ramucirumab beyond progression with irinotecan does not yield a significant overall survival benefit over irinotecan alone in ramucirumab-refractory advanced gastric cancer patients."
+  }
+}]
